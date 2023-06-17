@@ -220,7 +220,7 @@ void worker_search(worker_t *worker)
             }
             else
             {
-                delta = 15;
+                delta = 17;
                 alpha = imax(-INF_SCORE, pvScore - delta);
                 beta = imin(INF_SCORE, pvScore + delta);
             }
