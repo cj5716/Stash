@@ -615,7 +615,7 @@ __main_loop:
                 R += !pvNode;
 
                 // Decrease the reduction if the move is a killer or countermove.
-                R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
+                R -= (histScore > 0 && (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter));
 
                 // Decrease the reduction if the move escapes a capture.
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
