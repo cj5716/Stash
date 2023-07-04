@@ -621,7 +621,7 @@ __main_loop:
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
 
                 // Increase/decrease the reduction based on the move's history.
-                R -= histScore / 4000;
+                R -= histScore / 3072;
 
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
