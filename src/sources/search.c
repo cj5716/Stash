@@ -628,7 +628,7 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
-                R = 1 - givesCheck;
+                R = !pvNode;
         }
         else
             R = 0;
