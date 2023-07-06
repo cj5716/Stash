@@ -628,7 +628,7 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
-                R = !pvNode;
+                R = 1 + (moveCount > 8);
         }
         else
             R = 0;
