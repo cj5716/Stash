@@ -584,7 +584,7 @@ __main_loop:
                     return singularBeta;
 
                 else if (ttScore >= beta)
-                    extension = -1;
+                    extension = -2;
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
             // that give check.
