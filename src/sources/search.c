@@ -577,7 +577,7 @@ __main_loop:
                 // move.
                 if (singularScore < singularBeta)
                 {
-                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 7)
+                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 5)
                         extension = 2;
                     else
                         extension = 1;
