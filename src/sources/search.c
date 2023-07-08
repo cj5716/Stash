@@ -577,11 +577,8 @@ __main_loop:
                 // move.
                 if (singularScore < singularBeta)
                 {
-                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 5)
-                    {
+                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 7)
                         extension = 2;
-                        ss->doubleExtensions++;
-                    }
                     else
                         extension = 1;
                 }
@@ -598,6 +595,7 @@ __main_loop:
             else if (givesCheck)
                 extension = 1;
         }
+        ss->doubleExtensions = (ss - 1)->doubleExtensions + (extension == 2);
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
 
