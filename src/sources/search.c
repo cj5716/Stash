@@ -560,7 +560,7 @@ __main_loop:
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend search by one or two plies.
+            // we extend non-LMR searches by one or two plies.
             if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
             {
@@ -594,15 +594,17 @@ __main_loop:
                     return singularBeta;
 
                 else if (ttScore >= beta)
-                    extension = -1 - !pvNode;
+                    extension = -1;
+
+                else if (ttScore <= singularScore)
+                    extension = -1;
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
             // that give check.
             else if (givesCheck)
                 extension = 1;
         }
-        
-        newDepth += extension;
+
         piece_t movedPiece = piece_on(board, from_sq(currmove));
 
         // Save the piece history for the current move so that sub-nodes can use
@@ -653,7 +655,7 @@ __main_loop:
         // reductions.
         if ((R && score > alpha) || (!R && !(pvNode && moveCount == 1)))
         {
-            score = -search(board, newDepth, -alpha - 1, -alpha, ss + 1, false);
+            score = -search(board, newDepth + extension, -alpha - 1, -alpha, ss + 1, false);
 
             // Update continuation histories for post-LMR searches.
             if (R) update_cont_histories(ss, depth, movedPiece, to_sq(currmove), score > alpha);
@@ -665,7 +667,7 @@ __main_loop:
         {
             (ss + 1)->pv = pv;
             pv[0] = NO_MOVE;
-            score = -search(board, newDepth, -beta, -alpha, ss + 1, true);
+            score = -search(board, newDepth + extension, -beta, -alpha, ss + 1, true);
         }
 
         undo_move(board, currmove);
