@@ -554,50 +554,47 @@ __main_loop:
                             worker->bfHistory, piece_on(board, from_sq(currmove)), currmove)
                                 : 0;
 
-        if (!rootNode)
+        // Singular Extensions. For high-depth nodes, if the TT entry
+        // suggests that the TT move is really good, we check if there are
+        // other moves which maintain the score close to the TT score. If
+        // that's not the case, we consider the TT move to be singular, and
+        // we extend non-LMR searches by one ply.
+        if (!rootNode && depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
+            && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
         {
-            // Singular Extensions. For high-depth nodes, if the TT entry
-            // suggests that the TT move is really good, we check if there are
-            // other moves which maintain the score close to the TT score. If
-            // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one ply.
-            if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
-                && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
+            score_t singularBeta = ttScore - depth;
+            int singularDepth = depth / 2;
+
+            // Exclude the TT move from the singular search.
+            ss->excludedMove = ttMove;
+            score_t singularScore =
+                search(board, singularDepth, singularBeta - 1, singularBeta, ss, false);
+            ss->excludedMove = NO_MOVE;
+
+            // Our singular search failed to produce a cutoff, extend the TT
+            // move.
+            if (singularScore < singularBeta)
             {
-                score_t singularBeta = ttScore - depth;
-                int singularDepth = depth / 2;
-
-                // Exclude the TT move from the singular search.
-                ss->excludedMove = ttMove;
-                score_t singularScore =
-                    search(board, singularDepth, singularBeta - 1, singularBeta, ss, false);
-                ss->excludedMove = NO_MOVE;
-
-                // Our singular search failed to produce a cutoff, extend the TT
-                // move.
-                if (singularScore < singularBeta)
+                if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 5)
                 {
-                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 5)
-                    {
-                        extension = 2;
-                        ss->doubleExtensions++;
-                    }
-                    else
-                        extension = 1;
+                    extension = 2;
+                    ss->doubleExtensions++;
                 }
-
-                // Multicut Pruning. If our singular search produced a cutoff,
-                // and the search bounds were equal or superior to our normal
-                // search, assume that there are multiple moves that beat beta
-                // in the current node, and return a search score early.
-                else if (singularBeta >= beta)
-                    return singularBeta;
+                else
+                    extension = 1;
             }
-            // Check Extensions. Extend non-LMR searches by one ply for moves
-            // that give check.
-            else if (givesCheck)
-                extension = 1;
+
+            // Multicut Pruning. If our singular search produced a cutoff,
+            // and the search bounds were equal or superior to our normal
+            // search, assume that there are multiple moves that beat beta
+            // in the current node, and return a search score early.
+            else if (singularBeta >= beta)
+                return singularBeta;
         }
+        // Check Extensions. Extend non-LMR searches by one ply for moves
+        // that give check.
+        else if (givesCheck)
+            extension = 1;
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
 
