@@ -596,7 +596,7 @@ __main_loop:
                 else if (ttScore >= beta)
                     extension = -1;
 
-                else if (ttScore <= singularScore)
+                else if (ttScore <= alpha)
                     extension = -1;
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
