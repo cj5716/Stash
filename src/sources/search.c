@@ -208,7 +208,7 @@ void worker_search(worker_t *worker)
 
             score_t alpha, beta, delta;
             int depth = iterDepth;
-            worker->rootDepth = depth;
+            worker->rootDepth = depth + 1;
             score_t pvScore = worker->rootMoves[worker->pvLine].prevScore;
 
             // Don't set aspiration window bounds for low depths, as the scores are
