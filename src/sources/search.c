@@ -578,7 +578,10 @@ __main_loop:
                 if (singularScore < singularBeta)
                 {
                     if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 7)
+                    {
                         extension = 2;
+                        ss->doubleExtensions++;
+                    }
                     else
                         extension = 1;
                 }
