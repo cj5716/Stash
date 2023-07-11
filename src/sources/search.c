@@ -438,9 +438,9 @@ score_t search(Board *board, int depth, score_t alpha, score_t beta, Searchstack
 
     if (rootNode && worker->pvLine) ttMove = worker->rootMoves[worker->pvLine].move;
 
-    // Razoring. If our static eval isn't good, and depth is low, it is likely
+    // Razoring. If our static eval isn't good, it is likely
     // that only a capture will save us at this stage. Drop into qsearch.
-    if (!pvNode && depth == 1 && ss->staticEval + 150 <= alpha)
+    if (!pvNode && ss->staticEval + 128 * depth + 32 <= alpha)
         return qsearch(board, alpha, beta, ss, false);
 
     improving = ss->plies >= 2 && ss->staticEval > (ss - 2)->staticEval;
