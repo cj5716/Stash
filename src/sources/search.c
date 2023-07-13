@@ -440,7 +440,7 @@ score_t search(Board *board, int depth, score_t alpha, score_t beta, Searchstack
 
     // Razoring. If our static eval isn't good, and depth is low, it is likely
     // that only a capture will save us at this stage. Drop into qsearch.
-    if (!pvNode && depth == 1 && ss->staticEval + 150 <= alpha)
+    if (!pvNode && depth <= 2 && ss->staticEval + 150 <= alpha)
         return qsearch(board, alpha, beta, ss, false);
 
     improving = ss->plies >= 2 && ss->staticEval > (ss - 2)->staticEval;
