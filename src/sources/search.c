@@ -656,7 +656,7 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
-                R = 1;
+                R = Reductions[imin(depth, 63)][imin(moveCount, 63)];
         }
         else
             R = 0;
