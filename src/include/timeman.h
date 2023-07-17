@@ -52,6 +52,7 @@ typedef enum bestmove_type_e
     Quiet,
     WeirdCheck,
     WeirdQuiet,
+    BadCapture,
     BM_TYPE_NB
 } bestmove_type_t;
 
