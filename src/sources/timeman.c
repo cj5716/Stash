@@ -29,11 +29,11 @@ const double BestmoveTypeScale[BM_TYPE_NB] = {
     0.45, // Promoting a piece
     0.50, // Capture with a very high SEE
     0.85, // Check not throwing away material
-    0.95, // Capture that is close to neutral SEE
+    0.95, // Capture
     1.00, // Quiet move not throwing away material
     1.20, // Check losing material
     1.40, // Quiet losing material
-    1.60, // Capture with a very low SEE
+    1.50, // Capture losing material
 };
 
 INLINED clock_t timemin(clock_t left, clock_t right) { return (left < right) ? left : right; }
@@ -148,7 +148,7 @@ void timeman_update(Timeman *tm, const Board *board, move_t bestmove, score_t sc
             tm->type = SoundCheck;
 
         else if (!isQuiet)
-            tm->type = see_greater_than(board, bestmove, -KNIGHT_MG_SCORE) ? Capture : BadCapture;
+            tm->type = see_greater_than(board, bestmove, 0) ? Capture : BadCapture;
 
         else if (see_greater_than(board, bestmove, 0))
             tm->type = Quiet;
