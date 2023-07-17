@@ -42,7 +42,7 @@ INLINED clock_t timemin(clock_t left, clock_t right) { return (left < right) ? l
 // INLINED clock_t timemax(clock_t left, clock_t right) { return (left > right) ? left : right; }
 
 // Scaling table based on the number of consecutive iterations the bestmove held
-const double BestmoveStabilityScale[7] = {2.50, 1.20, 0.90, 0.85, 0.80, 0.75, 0.70};
+const double BestmoveStabilityScale[7] = {2.30, 1.50, 0.90, 0.85, 0.80, 0.75, 0.70};
 
 void timeman_init(const Board *board, Timeman *tm, SearchParams *params, clock_t start)
 {
