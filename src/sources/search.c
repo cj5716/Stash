@@ -35,7 +35,7 @@ void init_search_tables(void)
 {
     // Compute the LMR base values based on depth and movecount.
     for (int d = 1; d < 64; ++d)
-        for (int m = 1; m < 64; ++m) Reductions[d][m] = -0.34 + log(d) * log(m) / 1.46;
+        for (int m = 1; m < 64; ++m) Reductions[d][m] = -0.84 + log(d) * log(m) / 1.46;
 
     // Compute the LMP movecount values based on depth.
     for (int d = 1; d < 7; ++d)
@@ -654,7 +654,7 @@ __main_loop:
 
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
-                R = iclamp(R, 0, newDepth - 1);
+                R = iclamp(R, -1, newDepth - 1);
             }
             else
                 R = 1;
@@ -666,7 +666,7 @@ __main_loop:
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
-        if ((R && score > alpha) || (!do_lmr && !(pvNode && moveCount == 1)))
+        if ((R > 0 && score > alpha) || (!do_lmr && !(pvNode && moveCount == 1)))
         {
             score =
                 -search(false, board, newDepth, -alpha - 1, -alpha, ss + 1, !cutNode);
