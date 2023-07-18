@@ -654,7 +654,7 @@ __main_loop:
 
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
-                R = iclamp(R, -(R < -3), newDepth - 1);
+                R = iclamp(R, 0, newDepth - 1);
             }
             else
                 R = 1;
@@ -666,7 +666,7 @@ __main_loop:
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
-        if ((R > 0 && score > alpha) || (!do_lmr && !(pvNode && moveCount == 1)))
+        if ((R && score > alpha) || (!do_lmr && !(pvNode && moveCount == 1)))
         {
             score =
                 -search(false, board, newDepth, -alpha - 1, -alpha, ss + 1, !cutNode);
