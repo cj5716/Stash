@@ -35,7 +35,7 @@ void init_search_tables(void)
 {
     // Compute the LMR base values based on depth and movecount.
     for (int d = 1; d < 64; ++d)
-        for (int m = 1; m < 64; ++m) Reductions[d][m] = -0.84 + log(d) * log(m) / 1.46;
+        for (int m = 1; m < 64; ++m) Reductions[d][m] = -0.34 + log(d) * log(m) / 1.46;
 
     // Compute the LMP movecount values based on depth.
     for (int d = 1; d < 7; ++d)
@@ -613,6 +613,7 @@ __main_loop:
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
+        newDepth += extension;
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
@@ -668,7 +669,7 @@ __main_loop:
         if ((R && score > alpha) || (!do_lmr && !(pvNode && moveCount == 1)))
         {
             score =
-                -search(false, board, newDepth + extension, -alpha - 1, -alpha, ss + 1, !cutNode);
+                -search(false, board, newDepth, -alpha - 1, -alpha, ss + 1, !cutNode);
 
             // Update continuation histories for post-LMR searches.
             if (R) update_cont_histories(ss, depth, movedPiece, to_sq(currmove), score > alpha);
@@ -680,7 +681,7 @@ __main_loop:
         {
             (ss + 1)->pv = pv;
             pv[0] = NO_MOVE;
-            score = -search(true, board, newDepth + extension, -beta, -alpha, ss + 1, false);
+            score = -search(true, board, newDepth, -beta, -alpha, ss + 1, false);
         }
 
         undo_move(board, currmove);
