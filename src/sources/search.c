@@ -649,7 +649,7 @@ __main_loop:
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
 
                 // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -3, 3);
+                R -= iclamp(histScore / 6000, -2, 2);
 
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
