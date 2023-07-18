@@ -654,7 +654,7 @@ __main_loop:
 
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
-                R = iclamp(R, -1, newDepth - 1);
+                R = iclamp(R, -(R < -3), newDepth - 1);
             }
             else
                 R = 1;
