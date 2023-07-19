@@ -573,7 +573,7 @@ __main_loop:
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one ply.
+            // we extend non-LMR searches by one or two plies.
             if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
             {
@@ -605,6 +605,9 @@ __main_loop:
                 // in the current node, and return a search score early.
                 else if (singularBeta >= beta)
                     return singularBeta;
+
+                else if (ttScore >= beta)
+                    extension = -1;
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
             // that give check.
@@ -661,7 +664,7 @@ __main_loop:
         else
             R = 0;
 
-        if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
+        if (do_lmr) score = -search(false, board, newDepth - R - (extension < 0) * extension, -alpha - 1, -alpha, ss + 1, true);
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
