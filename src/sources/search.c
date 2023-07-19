@@ -664,7 +664,7 @@ __main_loop:
         else
             R = 0;
 
-        if (do_lmr) score = -search(false, board, newDepth - R - (extension < 0) * extension, -alpha - 1, -alpha, ss + 1, true);
+        if (do_lmr) score = -search(false, board, newDepth - R + (extension < 0) * extension, -alpha - 1, -alpha, ss + 1, true);
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
