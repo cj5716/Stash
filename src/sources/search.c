@@ -660,7 +660,7 @@ __main_loop:
                 R = 1;
 
                 // Increase reduction if movecount is high
-                R += (moveCount > 13);
+                R += imin(moveCount, 63) / 16;
             }
         }
         else
