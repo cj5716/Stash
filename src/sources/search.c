@@ -650,10 +650,6 @@ __main_loop:
 
                 // Increase/decrease the reduction based on the move's history.
                 R -= iclamp(histScore / 6000, -3, 3);
-
-                // Clamp the reduction so that we don't extend the move or drop
-                // immediately into qsearch.
-                R = iclamp(R, 0, newDepth - 1);
             }
             else
             {
@@ -662,6 +658,9 @@ __main_loop:
                 // Increase reduction if movecount is high
                 R += imin(moveCount, 63) / 16;
             }
+            // Clamp the reduction so that we don't extend the move or drop
+            // immediately into qsearch.
+            R = iclamp(R, 0, newDepth - 1);
         }
         else
             R = 0;
