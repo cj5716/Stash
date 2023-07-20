@@ -656,7 +656,12 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
+            {
                 R = 1;
+
+                // Increase reduction if movecount is high
+                R += (moveCount > 13);
+            }
         }
         else
             R = 0;
