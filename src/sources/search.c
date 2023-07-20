@@ -656,7 +656,7 @@ __main_loop:
                 R = 1;
 
                 // Increase reduction if movecount is high
-                R += imin(moveCount, 63) / 16;
+                R += imin(moveCount, 47) / 16;
             }
             // Clamp the reduction so that we don't extend the move or drop
             // immediately into qsearch.
