@@ -103,8 +103,8 @@ void timeman_init(const Board *board, Timeman *tm, SearchParams *params, clock_t
 
 double score_difference_scale(score_t s)
 {
-    const score_t X = 100;
-    const double T = 1.8;
+    const score_t X = 125;
+    const double T = 2.0;
 
     // Clamp score to the range [-100, 100], and convert it to a time scale in
     // the range [0.5, 2.0].
