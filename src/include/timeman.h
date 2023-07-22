@@ -59,7 +59,7 @@ typedef enum bestmove_type_e
 extern const double BestmoveTypeScale[BM_TYPE_NB];
 
 // Global for scaling time usage based on stability
-extern const double BestmoveStabilityScale[5];
+extern const double BestmoveStabilityScale[7];
 
 // Enum for the type of time management to use
 typedef enum timeman_mode_e

@@ -25,7 +25,7 @@
 
 // Scaling table based on the move type
 const double BestmoveTypeScale[BM_TYPE_NB] = {
-    0.20, // One legal move
+    0.05, // One legal move
     0.45, // Promoting a piece
     0.50, // Capture with a very high SEE
     0.85, // Check not throwing away material
@@ -42,7 +42,7 @@ INLINED clock_t timemin(clock_t left, clock_t right) { return (left < right) ? l
 // INLINED clock_t timemax(clock_t left, clock_t right) { return (left > right) ? left : right; }
 
 // Scaling table based on the number of consecutive iterations the bestmove held
-const double BestmoveStabilityScale[5] = {2.50, 1.20, 0.90, 0.80, 0.75};
+const double BestmoveStabilityScale[7] = {2.50, 1.20, 0.90, 0.85, 0.80, 0.75, 0.70};
 
 void timeman_init(const Board *board, Timeman *tm, SearchParams *params, clock_t start)
 {
@@ -159,7 +159,7 @@ void timeman_update(Timeman *tm, const Board *board, move_t bestmove, score_t sc
             tm->type = WeirdQuiet;
     }
     else
-        tm->stability = imin(tm->stability + 1, 4);
+        tm->stability = imin(tm->stability + 1, 6);
 
     // Scale the time usage based on the type of bestmove we have.
     double scale = BestmoveTypeScale[tm->type];
