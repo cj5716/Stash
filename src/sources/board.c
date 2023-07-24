@@ -287,7 +287,7 @@ static int board_parse_castling(Board *board, const char *fen)
         }
 
         square_t rookSquare;
-        const color_t side = islower(fen[i]) ? BLACK : WHITE;
+        const color_t side = islower((unsigned char)fen[i]) ? BLACK : WHITE;
         const piece_t rook = create_piece(side, ROOK);
         const char castlingChar = toupper(fen[i]);
 
