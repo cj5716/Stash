@@ -613,6 +613,7 @@ __main_loop:
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
+        newDepth += extension;
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
@@ -651,6 +652,9 @@ __main_loop:
                 // Increase/decrease the reduction based on the move's history.
                 R -= iclamp(histScore / 6000, -3, 3);
 
+                // Decrease reduction if move was doubly extended and we have a good history
+                R -= extension == 2 && histScore > 4096;
+
                 // Clamp the reduction so that we don't extend the move or drop
                 // immediately into qsearch.
                 R = iclamp(R, 0, newDepth - 1);
@@ -662,8 +666,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
