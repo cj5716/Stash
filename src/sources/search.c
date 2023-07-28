@@ -870,7 +870,11 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
             score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
 
             // Check if the move is unlikely to improve alpha.
-            if (delta < alpha) continue;
+            if (delta < alpha) 
+            {
+                bestScore = imax(bestScore, delta);
+                continue;
+            }
         }
 
         // Save the piece history for the current move so that sub-nodes can use
