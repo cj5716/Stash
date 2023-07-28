@@ -499,7 +499,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     }
 
     // Reduce depth if the node is absent from TT.
-    if (!rootNode && !found && depth >= 4) --depth;
+    if (!ss->excludedMove && !rootNode && !found && depth >= 4) --depth;
 
 __main_loop:
     movepicker_init(&mp, false, board, worker, ttMove, ss);
