@@ -450,7 +450,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // Futility Pruning. If our eval is quite good and depth is low, we just
     // assume that we won't fall far behind in the next plies, and we return the
     // eval.
-    if (!pvNode && depth <= 8 && eval - 120 * (depth - improving) >= beta && eval < VICTORY)
+    if (!pvNode && depth <= 8 && eval - 100 * (depth - improving) >= beta && eval < VICTORY)
         return eval;
 
     // Null Move Pruning. If our eval currently beats beta, and we still have
