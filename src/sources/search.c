@@ -547,7 +547,7 @@ __main_loop:
             // to lose too much material to be interesting.
             if (depth <= 8
                 && !see_greater_than(
-                    board, currmove, (isQuiet ? -62 * depth : -24 * depth * depth)))
+                    board, currmove, (isQuiet ? -80 * depth : -24 * depth * depth)))
                 continue;
         }
 
