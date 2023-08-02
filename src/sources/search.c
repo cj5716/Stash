@@ -400,14 +400,16 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         ttMove = entry->bestmove;
 
         // Check if we can directly return a score for non-PV nodes.
-        if (ttDepth >= depth && !pvNode)
-            if (((ttBound & LOWER_BOUND) && ttScore >= beta)
-                || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
+        if (ttDepth >= depth)
+            if ((ttBound == LOWER_BOUND && ttScore >= beta)
+                || (ttBound == UPPER_BOUND && ttScore <= alpha)
+                || ttBound == EXACT_BOUND)
             {
-                if ((ttBound & LOWER_BOUND) && !is_capture_or_promotion(board, ttMove))
+                if (ttScore >= beta && !is_capture_or_promotion(board, ttMove))
                     update_quiet_history(board, depth, ttMove, NULL, 0, ss);
 
-                return ttScore;
+                if (!pvNode)
+                    return ttScore;
             }
     }
 
