@@ -405,7 +405,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
                 if ((ttBound & LOWER_BOUND) && !is_capture_or_promotion(board, ttMove))
-                    update_quiet_history(board, depth, ttMove, NULL, 0, ss);
+                    update_quiet_history(board, depth + !cutNode, ttMove, NULL, 0, ss);
 
                 return ttScore;
             }
