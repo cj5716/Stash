@@ -871,6 +871,9 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
             // Check if the move is unlikely to improve alpha.
             if (delta < alpha) continue;
+
+            // If the move is unlikely to improve alpha and our does not win material, we prune this move.
+            if (futilityBase < alpha && !see_greater_than(board, currmove, 0)) continue;
         }
 
         // Save the piece history for the current move so that sub-nodes can use
