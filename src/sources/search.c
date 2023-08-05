@@ -656,7 +656,12 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
+            {
                 R = 1;
+
+                // Decrease the reduction for promotions.
+                R -= (move_type(currmove) == PROMOTION);
+            }
         }
         else
             R = 0;
