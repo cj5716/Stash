@@ -610,6 +610,10 @@ __main_loop:
             // that give check.
             else if (givesCheck)
                 extension = 1;
+
+            // Extend non-LMR searches by one ply for promotions.
+            else if (move_type(currmove) == PROMOTION)
+                extension = 1;
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
