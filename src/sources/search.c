@@ -619,6 +619,8 @@ __main_loop:
         ss->currentMove = currmove;
         ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)];
 
+        newDepth += extension;
+
         do_move_gc(board, currmove, &stack, givesCheck);
         atomic_fetch_add_explicit(&get_worker(board)->nodes, 1, memory_order_relaxed);
 
@@ -662,8 +664,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
