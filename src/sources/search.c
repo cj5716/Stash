@@ -605,6 +605,9 @@ __main_loop:
                 // in the current node, and return a search score early.
                 else if (singularBeta >= beta)
                     return singularBeta;
+
+                else if (ttScore >= beta)
+                    extension = -1;
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
             // that give check.
@@ -613,6 +616,7 @@ __main_loop:
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
+        newDepth += extension;
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
@@ -662,8 +666,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
