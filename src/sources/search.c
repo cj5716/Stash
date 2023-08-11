@@ -573,7 +573,7 @@ __main_loop:
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one ply.
+            // we extend search by one or two plies.
             if (depth >= 6 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
             {
@@ -606,13 +606,16 @@ __main_loop:
                 else if (singularBeta >= beta)
                     return singularBeta;
             }
-            // Check Extensions. Extend non-LMR searches by one ply for moves
+            // Check Extensions. Extend search by one ply for moves
             // that give check.
             else if (givesCheck)
                 extension = 1;
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
+
+        // Add extension to newDepth.
+        newDepth += extension;
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
@@ -662,8 +665,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
