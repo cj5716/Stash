@@ -575,7 +575,7 @@ __main_loop:
             // that's not the case, we consider the TT move to be singular, and
             // we extend search by one or two plies.
             if (depth >= 6 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
-                && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
+                && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
             {
                 score_t singularBeta = ttScore - depth;
                 int singularDepth = depth / 2;
