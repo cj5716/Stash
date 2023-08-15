@@ -614,6 +614,9 @@ __main_loop:
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
 
+        // Add extension to newDepth
+        newDepth += extension;
+
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
@@ -662,8 +665,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
