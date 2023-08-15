@@ -400,7 +400,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         ttMove = entry->bestmove;
 
         // Check if we can directly return a score for non-PV nodes.
-        if (ttDepth >= depth && !pvNode)
+        if (ttDepth >= depth && !pvNode && !ss->excludedMove)
             if (((ttBound & LOWER_BOUND) && ttScore >= beta)
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
