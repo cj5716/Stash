@@ -732,6 +732,9 @@ __main_loop:
                         update_capture_history(board, depth, bestmove, captures, ccount, ss);
                     break;
                 }
+                else
+                    // Reduce other moves if we have found at least one score improvement
+                    if (depth > 1 && depth < 12 && beta < VICTORY && score > -VICTORY) --depth;
             }
         }
 
