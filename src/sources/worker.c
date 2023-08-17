@@ -53,6 +53,7 @@ void worker_init(worker_t *worker, size_t idx)
     worker->pawnTable = calloc(PawnTableSize, sizeof(PawnEntry));
     worker->exit = false;
     worker->searching = true;
+    worker->rootDepth = 0;
 
     if (worker->pawnTable == NULL)
     {

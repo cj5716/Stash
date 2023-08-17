@@ -223,6 +223,7 @@ void worker_search(worker_t *worker)
             score_t alpha, beta, delta;
             int depth = iterDepth;
             score_t pvScore = worker->rootMoves[worker->pvLine].prevScore;
+            worker->rootDepth = depth + 1;
 
             // Don't set aspiration window bounds for low depths, as the scores are
             // very volatile.
@@ -567,14 +568,14 @@ __main_loop:
         bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
-        if (!rootNode)
+        if (ss->plies < 2 * worker->rootDepth)
         {
             // Singular Extensions. For high-depth nodes, if the TT entry
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
             // we extend non-LMR searches by one ply.
-            if (depth >= 6 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
+            if (!rootNode && depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
             {
                 score_t singularBeta = ttScore - depth;
