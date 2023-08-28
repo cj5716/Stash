@@ -578,8 +578,9 @@ __main_loop:
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one ply.
-            if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
+            // we extend search by one or two plies, depending on the margin at
+            // which the singular search failed low.
+            if (depth >= 6 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 2)
             {
                 score_t singularBeta = ttScore - 3 * depth / 4;
@@ -595,7 +596,7 @@ __main_loop:
                 // move.
                 if (singularScore < singularBeta)
                 {
-                    if (!pvNode && singularBeta - singularScore > 24 && ss->doubleExtensions <= 5)
+                    if (!pvNode && singularBeta - singularScore > 20 && ss->doubleExtensions <= 11)
                     {
                         extension = 2;
                         ss->doubleExtensions++;
@@ -611,11 +612,14 @@ __main_loop:
                 else if (singularBeta >= beta)
                     return singularBeta;
             }
-            // Check Extensions. Extend non-LMR searches by one ply for moves
+            // Check Extensions. Extend search by one ply for moves
             // that give check.
             else if (givesCheck)
                 extension = 1;
         }
+
+        // Add extension to newDepth
+        newDepth += extension;
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
 
@@ -667,8 +671,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
