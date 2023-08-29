@@ -34,8 +34,7 @@ int Pruning[2][7];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i)
-        Reductions[i] = log(i) * 26.48;
+    for (int i = 1; i < 256; ++i) Reductions[i] = log(i) * 26.48;
 
     // Compute the LMP movecount values based on depth.
     for (int d = 1; d < 7; ++d)
@@ -293,14 +292,14 @@ __retry:
                 depth = iterDepth;
                 beta = (alpha + beta) / 2;
                 alpha = imax(-INF_SCORE, (int)pvScore - delta);
-                delta += delta / 4;
+                delta += delta / 3;
                 goto __retry;
             }
             else if (bound == LOWER_BOUND)
             {
                 depth -= (depth > iterDepth / 2);
                 beta = imin(INF_SCORE, (int)pvScore + delta);
-                delta += delta / 4;
+                delta += delta / 3;
                 goto __retry;
             }
         }
