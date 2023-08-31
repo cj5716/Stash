@@ -511,7 +511,7 @@ __main_loop:
     // and the transposition table move is a capture that returns a score
     // far above beta, we can assume that the opponent just blundered a piece
     // by giving check, and we return this probCut score.
-    score_t probCutBeta = beta + 512;
+    int probCutBeta = beta + 512;
     if (inCheck && !pvNode && is_capture_or_promotion(board, ttMove) && ttBound & LOWER_BOUND
         && ttDepth >= depth - 3 && ttScore >= probCutBeta && abs(beta) < VICTORY
         && abs(ttScore) < VICTORY)
