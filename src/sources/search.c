@@ -395,6 +395,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     hashkey_t key = board->stack->boardKey ^ ((hashkey_t)ss->excludedMove << 16);
     TT_Entry *entry = tt_probe(key, &found);
     score_t eval;
+    score_t probCutBeta;
 
     if (found)
     {
@@ -511,7 +512,7 @@ __main_loop:
     // and the transposition table move is a capture that returns a score
     // far above beta, we can assume that the opponent just blundered a piece
     // by giving check, and we return this probCut score.
-    int probCutBeta = beta + 512;
+    probCutBeta = beta + 512;
     if (inCheck && !pvNode && is_capture_or_promotion(board, ttMove) && ttBound & LOWER_BOUND
         && ttDepth >= depth - 3 && ttScore >= probCutBeta && abs(beta) < VICTORY
         && abs(ttScore) < VICTORY)
