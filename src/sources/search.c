@@ -34,8 +34,7 @@ int Pruning[2][7];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i)
-        Reductions[i] = log(i) * 26.48;
+    for (int i = 1; i < 256; ++i) Reductions[i] = log(i) * 26.48;
 
     // Compute the LMP movecount values based on depth.
     for (int d = 1; d < 7; ++d)
@@ -507,6 +506,17 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     if (!rootNode && !found && depth >= 4) --depth;
 
 __main_loop:
+
+    // Idea taken from Stockfish. If we are in check
+    // and the transposition table move is a capture that returns a score
+    // far above beta, we can assume that the opponent just blundered a piece
+    // by giving check, and we return this probCut score.
+    score_t probCutBeta = beta + 512;
+    if (inCheck && !pvNode && is_capture_or_promotion(board, ttMove) && ttBound & LOWER_BOUND
+        && ttDepth >= depth - 3 && ttScore >= probCutBeta && abs(beta) < VICTORY
+        && abs(ttScore) < VICTORY)
+        return probCutBeta;
+
     movepicker_init(&mp, false, board, worker, ttMove, ss);
 
     move_t currmove;
