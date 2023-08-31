@@ -612,7 +612,7 @@ __main_loop:
                     return singularBeta;
 
                 else if (cutNode && ttScore <= alpha)
-                    extension = -1;
+                    extension = -2;
             }
             // Check Extensions. Extend search by one ply for moves
             // that give check.
