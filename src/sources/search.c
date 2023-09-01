@@ -514,7 +514,7 @@ __main_loop:
     // by giving check, and we return this probCut score.
     probCutBeta = beta + 512;
     if (inCheck && !pvNode && is_capture_or_promotion(board, ttMove) && ttBound & LOWER_BOUND
-        && ttDepth >= depth - 3 && ttScore >= probCutBeta && abs(beta) < VICTORY
+        && ttDepth >= depth - 2 && ttScore >= probCutBeta && abs(beta) < VICTORY
         && abs(ttScore) < VICTORY)
         return probCutBeta;
 
