@@ -395,6 +395,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     hashkey_t key = board->stack->boardKey ^ ((hashkey_t)ss->excludedMove << 16);
     TT_Entry *entry = tt_probe(key, &found);
     score_t eval;
+    score_t probCutBeta;
 
     if (found)
     {
@@ -506,6 +507,17 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     if (!rootNode && !found && depth >= 4) --depth;
 
 __main_loop:
+
+    // Idea taken from Stockfish. If we are in check
+    // and the transposition table move is a capture that returns a score
+    // far above beta, we can assume that the opponent just blundered a piece
+    // by giving check, and we return this probCut score.
+    probCutBeta = beta + 512;
+    if (inCheck && !pvNode && ttMove != NO_MOVE && is_capture_or_promotion(board, ttMove)
+        && ttBound & LOWER_BOUND && ttDepth >= depth - 2 && ttScore >= probCutBeta
+        && abs(beta) < VICTORY && abs(ttScore) < VICTORY)
+        return probCutBeta;
+
     movepicker_init(&mp, false, board, worker, ttMove, ss);
 
     move_t currmove;
