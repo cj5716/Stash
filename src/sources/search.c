@@ -646,6 +646,10 @@ __main_loop:
                 // Increase the reduction for cutNodes.
                 R += cutNode;
 
+                // Increase reduction if TT move is capture as it will lessen the chance that
+                // the best move is quiet.
+                R += is_capture_or_promotion(board, ttMove);
+
                 // Decrease the reduction if the move is a killer or countermove.
                 R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
