@@ -46,7 +46,7 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving)
 {
-    return (-1194 + Reductions[depth] * Reductions[movecount] + !improving * 417) / 1024;
+    return (-682 + Reductions[depth] * Reductions[movecount] + !improving * 417) / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -516,6 +516,7 @@ __main_loop:
     move_t captures[64];
     int ccount = 0;
     bool skipQuiets = false;
+    bool ttNoisy = is_capture_or_promotion(board, ttMove);
 
     while ((currmove = movepicker_next_move(&mp, skipQuiets)) != NO_MOVE)
     {
@@ -646,9 +647,9 @@ __main_loop:
                 // Increase the reduction for cutNodes.
                 R += cutNode;
 
-                // Increase reduction if TT move is capture as it will lessen the chance that
-                // the best move is quiet.
-                R += is_capture_or_promotion(board, ttMove);
+                // Increase reduction if TT move is capture or promotion as it is unlikely that the
+                // best move is quiet.
+                R += ttNoisy;
 
                 // Decrease the reduction if the move is a killer or countermove.
                 R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
