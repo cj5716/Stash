@@ -56,16 +56,27 @@ void init_searchstack(Searchstack *ss)
     for (int i = 0; i < 256; ++i) (ss + i)->plies = i - 2;
 }
 
-int get_history_score(
-    const Board *board, const worker_t *worker, const Searchstack *ss, move_t move)
+int get_cont_history_score(
+    const Board *board, const Searchstack *ss, move_t move)
 {
     const piece_t movedPiece = piece_on(board, from_sq(move));
-    int history = get_bf_history_score(worker->bfHistory, movedPiece, move);
+    int history = 0;
 
     if ((ss - 1)->pieceHistory != NULL)
         history += get_pc_history_score(*(ss - 1)->pieceHistory, movedPiece, to_sq(move));
     if ((ss - 2)->pieceHistory != NULL)
         history += get_pc_history_score(*(ss - 2)->pieceHistory, movedPiece, to_sq(move));
+
+    return history;
+}
+
+
+int get_history_score(
+    const Board *board, const worker_t *worker, const Searchstack *ss, move_t move)
+{
+    const piece_t movedPiece = piece_on(board, from_sq(move));
+    int history = get_bf_history_score(worker->bfHistory, movedPiece, move)
+    + get_cont_history_score(board, ss, move);
 
     return history;
 }
@@ -873,22 +884,29 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
         bool givesCheck = move_gives_check(board, currmove);
 
-        // Futility Pruning. If we already have non-mating score and our move
-        // doesn't give check, test if playing it has a chance to make the score
-        // go over alpha.
-        if (bestScore > -MATE_FOUND && canFutilityPrune && !givesCheck
-            && move_type(currmove) == NORMAL_MOVE)
-        {
-            score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
-
-            // Check if the move is unlikely to improve alpha.
-            if (delta < alpha) continue;
-        }
-
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
         ss->pieceHistory = &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)];
+
+        // Futility Pruning. If we already have non-mating score and our move
+        // doesn't give check, test if playing it has a chance to make the score
+        // go over alpha.
+        if (bestScore > -MATE_FOUND)
+        {
+            if (canFutilityPrune && !givesCheck
+                && move_type(currmove) == NORMAL_MOVE)
+            {
+                score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
+
+                // Check if the move is unlikely to improve alpha.
+                if (delta < alpha) continue;
+            }
+
+            if (!is_capture_or_promotion(board, currmove) && get_cont_history_score(board, ss, currmove) < -256)
+                continue;
+
+        }
 
         Boardstack stack;
 
