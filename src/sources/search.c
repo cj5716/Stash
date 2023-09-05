@@ -517,6 +517,7 @@ __main_loop:
     move_t captures[64];
     int ccount = 0;
     bool skipQuiets = false;
+    bool ttNoisy = is_capture_or_promotion(board, ttMove);
 
     while ((currmove = movepicker_next_move(&mp, skipQuiets)) != NO_MOVE)
     {
@@ -572,13 +573,14 @@ __main_loop:
         bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
-        if (!rootNode && ss->plies < 2 * worker->rootDepth && 2 * ss->doubleExtensions < worker->rootDepth)
+        if (!rootNode && ss->plies < 2 * worker->rootDepth
+            && 2 * ss->doubleExtensions < worker->rootDepth)
         {
             // Singular Extensions. For high-depth nodes, if the TT entry
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one or two lies, depending on the 
+            // we extend non-LMR searches by one or two lies, depending on the
             // margin that the singular search failed low.
             if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
@@ -649,7 +651,12 @@ __main_loop:
                 R += cutNode;
 
                 // Decrease the reduction if the move is a killer or countermove.
-                R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
+                if (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter) R--;
+
+                // Increase the reduction if the TT move is noisy, as it will be less likely for a
+                // quiet move to beat it.
+                else if (ttNoisy)
+                    R++;
 
                 // Decrease the reduction if the move escapes a capture.
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
