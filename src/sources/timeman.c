@@ -140,16 +140,16 @@ void timeman_update(Timeman *tm, const Board *board, move_t bestmove, score_t sc
         else if (move_type(bestmove) == PROMOTION)
             tm->type = Promotion;
 
-        else if (!isQuiet && see_greater_than(board, bestmove, KNIGHT_MG_SCORE))
+        else if (!isQuiet && see_greater_than(board, bestmove, KNIGHT_MG_SCORE - 1))
             tm->type = SoundCapture;
 
-        else if (givesCheck && see_greater_than(board, bestmove, 0))
+        else if (givesCheck && see_greater_than(board, bestmove, -1))
             tm->type = SoundCheck;
 
         else if (!isQuiet)
             tm->type = Capture;
 
-        else if (see_greater_than(board, bestmove, 0))
+        else if (see_greater_than(board, bestmove, -1))
             tm->type = Quiet;
 
         else if (givesCheck)
