@@ -663,7 +663,7 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
-                R /= 3;
+                R = imin(R / 3, 2);
         }
         else
             R = 0;
