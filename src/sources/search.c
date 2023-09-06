@@ -572,13 +572,14 @@ __main_loop:
         bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
-        if (!rootNode && ss->plies < 2 * worker->rootDepth && 2 * ss->doubleExtensions < worker->rootDepth)
+        if (!rootNode && ss->plies < 2 * worker->rootDepth
+            && 2 * ss->doubleExtensions < worker->rootDepth)
         {
             // Singular Extensions. For high-depth nodes, if the TT entry
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one or two lies, depending on the 
+            // we extend non-LMR searches by one or two lies, depending on the
             // margin that the singular search failed low.
             if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
@@ -636,12 +637,12 @@ __main_loop:
         // to produce cutoffs in standard searches.
         if (do_lmr)
         {
+            // Set the base depth reduction value based on depth and
+            // movecount.
+            R = lmr_base_value(depth, moveCount, improving);
+
             if (isQuiet)
             {
-                // Set the base depth reduction value based on depth and
-                // movecount.
-                R = lmr_base_value(depth, moveCount, improving);
-
                 // Increase the reduction for non-PV nodes.
                 R += !pvNode;
 
@@ -662,7 +663,7 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
-                R = 1;
+                R /= 3;
         }
         else
             R = 0;
