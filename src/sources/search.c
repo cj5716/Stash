@@ -355,7 +355,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     }
 
     // Drop into qsearch if the depth isn't strictly positive.
-    if (depth <= 0) return qsearch(pvNode, board, alpha, beta, ss);
+    if (depth <= 0) return qsearch(pvNode, board, 0, alpha, beta, ss);
 
     Movepicker mp;
     move_t pv[256];
@@ -448,7 +448,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // Razoring. If our static eval isn't good, and depth is low, it is likely
     // that only a capture will save us at this stage. Drop into qsearch.
     if (!pvNode && depth == 1 && ss->staticEval + 150 <= alpha)
-        return qsearch(false, board, alpha, beta, ss);
+        return qsearch(false, board, 0, alpha, beta, ss);
 
     improving = ss->plies >= 2 && ss->staticEval > (ss - 2)->staticEval;
 
@@ -767,7 +767,7 @@ __main_loop:
     return bestScore;
 }
 
-score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchstack *ss)
+score_t qsearch(bool pvNode, Board *board, int depth, score_t alpha, score_t beta, Searchstack *ss)
 {
     worker_t *worker = get_worker(board);
     const score_t oldAlpha = alpha;
@@ -806,6 +806,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
         // Check if we can directly return a score for non-PV nodes.
         if (!pvNode
+            && depth < 0
             && (((ttBound & LOWER_BOUND) && ttScore >= beta)
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha)))
             return ttScore;
@@ -897,7 +898,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         do_move_gc(board, currmove, &stack, givesCheck);
         atomic_fetch_add_explicit(&get_worker(board)->nodes, 1, memory_order_relaxed);
 
-        score_t score = -qsearch(pvNode, board, -beta, -alpha, ss + 1);
+        score_t score = -qsearch(pvNode, board, depth - 1, -beta, -alpha, ss + 1);
         undo_move(board, currmove);
 
         // Check for search abortion here.
