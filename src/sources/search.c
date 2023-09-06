@@ -56,7 +56,7 @@ void init_searchstack(Searchstack *ss)
     for (int i = 0; i < 256; ++i) (ss + i)->plies = i - 2;
 }
 
-int get_history_score(
+int get_quiet_history_score(
     const Board *board, const worker_t *worker, const Searchstack *ss, move_t move)
 {
     const piece_t movedPiece = piece_on(board, from_sq(move));
@@ -66,6 +66,23 @@ int get_history_score(
         history += get_pc_history_score(*(ss - 1)->pieceHistory, movedPiece, to_sq(move));
     if ((ss - 2)->pieceHistory != NULL)
         history += get_pc_history_score(*(ss - 2)->pieceHistory, movedPiece, to_sq(move));
+
+    return history;
+}
+
+int get_capture_history_score(
+    const Board *board, const worker_t *worker, move_t move)
+{
+    const piece_t movedPiece = piece_on(board, from_sq(move));
+    const square_t to = to_sq(move);
+    piecetype_t captured = piece_type(piece_on(board, to));
+
+    if (move_type(move) == PROMOTION)
+        captured = piece_type(promotion_type(move));
+    else if (move_type(move) == EN_PASSANT)
+        captured = PAWN;
+
+    int history = get_cap_history_score(worker->capHistory, movedPiece, to, captured);
 
     return history;
 }
@@ -570,7 +587,8 @@ __main_loop:
         int extension = 0;
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
-        int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
+        bool soundSeeScore = see_greater_than(board, currmove, 0);
+        int histScore = isQuiet ? get_quiet_history_score(board, worker, ss, currmove) : get_capture_history_score(board, worker, currmove);
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
             && 2 * ss->doubleExtensions < worker->rootDepth)
@@ -641,29 +659,27 @@ __main_loop:
             // movecount.
             R = lmr_base_value(depth, moveCount, improving);
 
-            if (isQuiet)
-            {
-                // Increase the reduction for non-PV nodes.
-                R += !pvNode;
+            // Increase the reduction for non-PV nodes.
+            R += !pvNode;
 
-                // Increase the reduction for cutNodes.
-                R += cutNode;
+            // Increase the reduction for cutNodes.
+            R += cutNode;
 
-                // Decrease the reduction if the move is a killer or countermove.
-                R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
+            // Decrease the reduction if the move is a killer or countermove.
+            R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-                // Decrease the reduction if the move escapes a capture.
-                R -= !see_greater_than(board, reverse_move(currmove), 0);
+            // Decrease the reduction if the move has a sound SEE score.
+            R -= soundSeeScore;
 
-                // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -3, 3);
+            // Increase/decrease the reduction based on the move's history.
+            R -= iclamp(histScore / 6000, -3, 3);
 
-                // Clamp the reduction so that we don't extend the move or drop
-                // immediately into qsearch.
-                R = iclamp(R, 0, newDepth - 1);
-            }
-            else
-                R /= 3;
+            // If the move is noisy, reduce reduction by a factor of 2.
+            if (!isQuiet) R /= 2;
+
+            // Clamp the reduction so that we don't extend the move or drop
+            // immediately into qsearch.
+            R = iclamp(R, 0, newDepth - 1);
         }
         else
             R = 0;
