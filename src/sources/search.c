@@ -570,7 +570,6 @@ __main_loop:
         int extension = 0;
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
-        bool soundSEE = see_greater_than(board, currmove, 0);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
@@ -651,8 +650,8 @@ __main_loop:
             // Decrease the reduction if the move is a killer or countermove.
             R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-            // Decrease the reduction if the move has a sound SEE score.
-            R -= soundSEE;
+            // Decrease the reduction if the quiet move escapes a capture.
+            R -= isQuiet && !see_greater_than(board, reverse_move(currmove), 0);
 
             // Increase/decrease the reduction based on the move's history.
             R -= iclamp(histScore / 6000, -3, 3);
