@@ -517,7 +517,7 @@ __main_loop:
     move_t captures[64];
     int ccount = 0;
     bool skipQuiets = false;
-    bool ttNoisy = is_capture_or_promotion(board, ttMove);
+    bool ttNoisy = ttMove != NO_MOVE && is_capture_or_promotion(board, ttMove);
 
     while ((currmove = movepicker_next_move(&mp, skipQuiets)) != NO_MOVE)
     {
