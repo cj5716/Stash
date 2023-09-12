@@ -860,6 +860,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
     if (pvNode) (ss + 1)->pv = pv;
 
     // Check if Futility Pruning is possible in the moves loop.
+    const bool canFutilityPrune = (!inCheck && board->stack->material[board->sideToMove]);
     const score_t futilityBase = bestScore + 120;
 
     while ((currmove = movepicker_next_move(&mp, false)) != NO_MOVE)
@@ -876,7 +877,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         // Futility Pruning. If we already have non-mating score and our move
         // doesn't give check, test if playing it has a chance to make the score
         // go over alpha.
-        if (bestScore > -MATE_FOUND && !inCheck && !givesCheck
+        if (bestScore > -MATE_FOUND && canFutilityPrune && !givesCheck
             && move_type(currmove) == NORMAL_MOVE)
         {
             score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
