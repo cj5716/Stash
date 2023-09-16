@@ -450,7 +450,9 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     if (!pvNode && depth == 1 && ss->staticEval + 150 <= alpha)
         return qsearch(false, board, alpha, beta, ss);
 
-    improving = ss->plies >= 2 && ss->staticEval > (ss - 2)->staticEval;
+    improving = (ss - 2)->staticEval != NO_SCORE
+                    ? ss->plies >= 2 && ss->staticEval > (ss - 2)->staticEval
+                    : ss->plies >= 4 && ss->staticEval > (ss - 4)->staticEval;
 
     // Futility Pruning. If our eval is quite good and depth is low, we just
     // assume that we won't fall far behind in the next plies, and we return the
