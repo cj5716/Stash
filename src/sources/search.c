@@ -227,11 +227,11 @@ void worker_search(worker_t *worker)
 
             score_t alpha, beta, delta;
             int depth = iterDepth;
-            score_t pvScore = worker->rootMoves[worker->pvLine].prevScore;
+            score_t pvScore = worker->rootMoves[worker->pvLine].avgScore;
 
             // Don't set aspiration window bounds for low depths, as the scores are
             // very volatile.
-            if (iterDepth <= 7)
+            if (iterDepth <= 5)
             {
                 delta = 0;
                 alpha = -INF_SCORE;
@@ -700,6 +700,8 @@ __main_loop:
         {
             RootMove *cur = find_root_move(worker->rootMoves + worker->pvLine,
                 worker->rootMoves + worker->rootCount, currmove);
+
+            cur->avgScore = cur->avgScore != -INF_SCORE ? (2 * score + cur->avgScore) / 3 : score;
 
             // Update the PV in root nodes for the first move, and for all moves
             // beating alpha.
