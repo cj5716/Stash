@@ -47,10 +47,10 @@ enum
 void init_search_tables(void);
 
 // Updates the continuation histories for the given piece-to combination.
-void update_cont_histories(Searchstack *ss, int depth, piece_t piece, square_t to, bool failHigh);
+void update_cont_histories(Searchstack *ss, bool inCheck, int depth, piece_t piece, square_t to, bool failHigh);
 
 // Updates the quiet history for the bestmove and all failed quiets.
-void update_quiet_history(const Board *board, int depth, move_t bestmove, const move_t quiets[64],
+void update_quiet_history(const Board *board, bool inCheck, int depth, move_t bestmove, const move_t quiets[64],
     int qcount, Searchstack *ss);
 
 // Updates the capture history for the bestmove and all failed captures.

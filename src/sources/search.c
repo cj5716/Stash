@@ -57,15 +57,15 @@ void init_searchstack(Searchstack *ss)
 }
 
 int get_history_score(
-    const Board *board, const worker_t *worker, const Searchstack *ss, move_t move)
+    const Board *board, bool inCheck, const worker_t *worker, const Searchstack *ss, move_t move)
 {
     const piece_t movedPiece = piece_on(board, from_sq(move));
     int history = get_bf_history_score(worker->bfHistory, movedPiece, move);
 
     if ((ss - 1)->pieceHistory != NULL)
-        history += get_pc_history_score(*(ss - 1)->pieceHistory, movedPiece, to_sq(move));
+        history += get_pc_history_score(*(ss - 1)->pieceHistory, inCheck, movedPiece, to_sq(move));
     if ((ss - 2)->pieceHistory != NULL)
-        history += get_pc_history_score(*(ss - 2)->pieceHistory, movedPiece, to_sq(move));
+        history += get_pc_history_score(*(ss - 2)->pieceHistory, inCheck, movedPiece, to_sq(move));
 
     return history;
 }
@@ -410,7 +410,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
                 if ((ttBound & LOWER_BOUND) && !is_capture_or_promotion(board, ttMove))
-                    update_quiet_history(board, depth, ttMove, NULL, 0, ss);
+                    update_quiet_history(board, inCheck, depth, ttMove, NULL, 0, ss);
 
                 return ttScore;
             }
@@ -570,7 +570,7 @@ __main_loop:
         int extension = 0;
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
-        int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
+        int histScore = isQuiet ? get_history_score(board, inCheck, worker, ss, currmove) : 0;
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
             && 2 * ss->doubleExtensions < worker->rootDepth)
@@ -624,7 +624,7 @@ __main_loop:
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)];
+        ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)][inCheck];
 
         do_move_gc(board, currmove, &stack, givesCheck);
         atomic_fetch_add_explicit(&get_worker(board)->nodes, 1, memory_order_relaxed);
@@ -734,7 +734,7 @@ __main_loop:
                 if (alpha >= beta)
                 {
                     // Update move histories.
-                    if (isQuiet) update_quiet_history(board, depth, bestmove, quiets, qcount, ss);
+                    if (isQuiet) update_quiet_history(board, inCheck, depth, bestmove, quiets, qcount, ss);
                     if (moveCount != 1)
                         update_capture_history(board, depth, bestmove, captures, ccount, ss);
                     break;
@@ -892,7 +892,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)];
+        ss->pieceHistory = &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)][inCheck];
 
         Boardstack stack;
 

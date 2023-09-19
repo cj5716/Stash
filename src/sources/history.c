@@ -20,17 +20,17 @@
 #include "search.h"
 #include "worker.h"
 
-void update_cont_histories(Searchstack *ss, int depth, piece_t piece, square_t to, bool failHigh)
+void update_cont_histories(Searchstack *ss, bool inCheck, int depth, piece_t piece, square_t to, bool failHigh)
 {
     int bonus = history_bonus(depth);
 
     if (!failHigh) bonus = -bonus;
 
-    if ((ss - 1)->pieceHistory != NULL) add_pc_history(*(ss - 1)->pieceHistory, piece, to, bonus);
-    if ((ss - 2)->pieceHistory != NULL) add_pc_history(*(ss - 2)->pieceHistory, piece, to, bonus);
+    if ((ss - 1)->pieceHistory != NULL) add_pc_history(*(ss - 1)->pieceHistory, inCheck, piece, to, bonus);
+    if ((ss - 2)->pieceHistory != NULL) add_pc_history(*(ss - 2)->pieceHistory, inCheck, piece, to, bonus);
 }
 
-void update_quiet_history(const Board *board, int depth, move_t bestmove, const move_t quiets[64],
+void update_quiet_history(const Board *board, bool inCheck, int depth, move_t bestmove, const move_t quiets[64],
     int qcount, Searchstack *ss)
 {
     butterfly_history_t *bfHist = &get_worker(board)->bfHistory;
@@ -52,7 +52,7 @@ void update_quiet_history(const Board *board, int depth, move_t bestmove, const 
     }
 
     add_bf_history(*bfHist, piece, bestmove, bonus);
-    update_cont_histories(ss, depth, piece, to, true);
+    update_cont_histories(ss, inCheck, depth, piece, to, true);
 
     // Set the bestmove as a killer.
     if (ss->killers[0] != bestmove)
@@ -68,7 +68,7 @@ void update_quiet_history(const Board *board, int depth, move_t bestmove, const 
         to = to_sq(quiets[i]);
 
         add_bf_history(*bfHist, piece, quiets[i], -bonus);
-        update_cont_histories(ss, depth, piece, to, false);
+        update_cont_histories(ss, inCheck, depth, piece, to, false);
     }
 }
 

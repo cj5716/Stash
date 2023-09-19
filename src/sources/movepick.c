@@ -99,9 +99,9 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
 
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
-            begin->score += get_pc_history_score(*mp->pieceHistory[0], moved, to);
+            begin->score += get_pc_history_score(*mp->pieceHistory[0], board->stack->checkers, moved, to);
         if (mp->pieceHistory[1] != NULL)
-            begin->score += get_pc_history_score(*mp->pieceHistory[1], moved, to);
+            begin->score += get_pc_history_score(*mp->pieceHistory[1], board->stack->checkers, moved, to);
 
         ++begin;
     }
@@ -130,9 +130,9 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)
-                begin->score += get_pc_history_score(*mp->pieceHistory[0], moved, to);
+                begin->score += get_pc_history_score(*mp->pieceHistory[0], true, moved, to);
             if (mp->pieceHistory[1] != NULL)
-                begin->score += get_pc_history_score(*mp->pieceHistory[1], moved, to);
+                begin->score += get_pc_history_score(*mp->pieceHistory[1], true, moved, to);
         }
 
         ++begin;
