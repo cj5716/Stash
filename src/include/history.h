@@ -30,9 +30,9 @@ enum
 };
 
 typedef int16_t butterfly_history_t[COLOR_NB][SQUARE_NB * SQUARE_NB];
-typedef int16_t piece_history_t[PIECE_NB][SQUARE_NB];
+typedef int16_t piece_history_t[2][PIECE_NB][SQUARE_NB];
 typedef int16_t capture_history_t[PIECE_NB][SQUARE_NB][PIECETYPE_NB];
-typedef piece_history_t continuation_history_t[PIECE_NB][SQUARE_NB][2];
+typedef piece_history_t continuation_history_t[2][PIECE_NB][SQUARE_NB];
 typedef move_t countermove_history_t[PIECE_NB][SQUARE_NB];
 
 // Returns the history bonus for the given depth.
@@ -58,7 +58,7 @@ INLINED score_t get_bf_history_score(const butterfly_history_t hist, piece_t pie
 // Updates the piece history table for the given piece and destination square.
 INLINED void add_pc_history(piece_history_t hist, bool inCheck, piece_t pc, square_t to, int32_t bonus)
 {
-    int16_t *entry = &hist[pc][to][inCheck];
+    int16_t *entry = &hist[inCheck][pc][to];
 
     *entry += bonus - (int32_t)*entry * abs(bonus) / HistoryResolution;
 }
@@ -66,7 +66,7 @@ INLINED void add_pc_history(piece_history_t hist, bool inCheck, piece_t pc, squa
 // Gets the piece history bonus for the given piece and destination square.
 INLINED score_t get_pc_history_score(const piece_history_t hist, bool inCheck, piece_t pc, square_t to)
 {
-    return hist[pc][to][inCheck] / HistoryScale;
+    return hist[inCheck][pc][to] / HistoryScale;
 }
 
 // Updates the capture history table for the given piece, destination square and captured piece.

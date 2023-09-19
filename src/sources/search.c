@@ -624,7 +624,7 @@ __main_loop:
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)][inCheck];
+        ss->pieceHistory = &worker->ctHistory[inCheck][movedPiece][to_sq(currmove)];
 
         do_move_gc(board, currmove, &stack, givesCheck);
         atomic_fetch_add_explicit(&get_worker(board)->nodes, 1, memory_order_relaxed);
@@ -679,7 +679,7 @@ __main_loop:
             score = -search(false, board, newDepth, -alpha - 1, -alpha, ss + 1, !cutNode);
 
             // Update continuation histories for post-LMR searches.
-            if (R) update_cont_histories(ss, depth, movedPiece, to_sq(currmove), score > alpha);
+            if (R) update_cont_histories(ss, depth, inCheck, movedPiece, to_sq(currmove), score > alpha);
         }
 
         // In PV nodes, perform an additional full-window search for the first
@@ -892,7 +892,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)][inCheck];
+        ss->pieceHistory = &worker->ctHistory[inCheck][piece_on(board, from_sq(currmove))][to_sq(currmove)];
 
         Boardstack stack;
 
