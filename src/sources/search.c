@@ -541,7 +541,7 @@ __main_loop:
 
         bool isQuiet = !is_capture_or_promotion(board, currmove);
 
-        if (!rootNode && bestScore > -MATE_FOUND)
+        if (!rootNode && bestScore > -MATE_FOUND && board->stack->material[board->sideToMove])
         {
             // Late Move Pruning. For low-depth nodes, stop searching quiets
             // after a certain movecount has been reached.
