@@ -656,9 +656,6 @@ __main_loop:
                 // Decrease the reduction if the move is a killer or countermove.
                 R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-                // Decrease the reduction if the move escapes a capture.
-                R -= !see_greater_than(board, reverse_move(currmove), 0);
-
                 // Increase/decrease the reduction based on the move's history.
                 R -= iclamp(histScore / 6000, -3, 3);
 
