@@ -619,7 +619,7 @@ __main_loop:
 
                 // Negative extensions. If our TT score is greater than beta, we reduce this node.
                 else if (ttScore >= beta)
-                    extension = -2;
+                    extension = -1;
             }
             // Check Extensions. Extend search by one ply for moves
             // that give check.
