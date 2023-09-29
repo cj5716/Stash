@@ -585,11 +585,11 @@ __main_loop:
             // that's not the case, we consider the TT move to be singular, and
             // we extend non-LMR searches by one or two lies, depending on the
             // margin that the singular search failed low.
-            if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
+            if (depth >= 6 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
             {
                 score_t singularBeta = ttScore - 3 * depth / 4;
-                int singularDepth = depth / 2;
+                int singularDepth = (depth - 1) / 2;
 
                 // Exclude the TT move from the singular search.
                 ss->excludedMove = ttMove;
