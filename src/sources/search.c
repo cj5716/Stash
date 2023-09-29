@@ -619,9 +619,9 @@ __main_loop:
 
                 // Negative extensions. If our TT score is greater than beta, we reduce this node.
                 else if (ttScore >= beta)
-                    extension = -1 - !pvNode;
+                    extension = -1;
             }
-            // Check Extensions. Extend non-LMR searches by one ply for moves
+            // Check Extensions. Extend search by one ply for moves
             // that give check.
             else if (givesCheck)
                 extension = 1;
