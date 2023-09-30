@@ -93,11 +93,16 @@ void update_capture_history(const Board *board, int depth, move_t bestmove,
 {
     (void)ss;
     capture_history_t *capHist = &get_worker(board)->capHistory;
-    int bonus = history_bonus(depth);
+    int bonus;
 
     // Apply history bonuses to the bestmove.
     if (is_capture_or_promotion(board, bestmove))
+    {
+        bonus = history_bonus(depth);
         update_single_capture(capHist, board, bestmove, bonus);
+    }
+    else
+       bonus = history_bonus(depth + 1);
 
     // Apply history penalties to all previous failing capture moves.
     for (int i = 0; i < ccount; ++i) update_single_capture(capHist, board, captures[i], -bonus);
