@@ -891,6 +891,8 @@ score_t evaluate(const Board *board)
         TRACE_PHASE(phase);
     }
 
+    score = score * (100 - board->stack->rule50) / 100;
+
     // Return the score relative to the side to move.
     return board->sideToMove == WHITE ? score : -score;
 }
