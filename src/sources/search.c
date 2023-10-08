@@ -660,23 +660,20 @@ __main_loop:
             // movecount.
             R = lmr_base_value(depth, moveCount, improving);
 
-            if (isQuiet)
-            {
-                // Increase the reduction for non-PV nodes.
-                R += !pvNode;
+            // Increase the reduction for non-PV nodes.
+            R += !pvNode;
 
-                // Increase the reduction for cutNodes.
-                R += cutNode;
+            // Increase the reduction for cutNodes.
+            R += cutNode;
 
-                // Decrease the reduction if the move is a killer or countermove.
-                R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
+            // Decrease the reduction if the move is a killer or countermove.
+            R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-                // Decrease the reduction if the move escapes a capture.
-                R -= !see_greater_than(board, reverse_move(currmove), 0);
+            // Decrease the reduction if the move escapes a capture.
+            R -= isQuiet && !see_greater_than(board, reverse_move(currmove), 0);
 
-                // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -3, 3);
-            }
+            // Increase/decrease the reduction based on the move's history.
+            R -= iclamp(histScore / 6000, -3, 3);
 
             // Clamp the reduction so that we don't extend the move or drop
             // immediately into qsearch.
