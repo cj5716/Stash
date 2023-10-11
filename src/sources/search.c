@@ -921,8 +921,8 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
     if (pvNode) (ss + 1)->pv = pv;
 
-    // Check if Futility Pruning is possible in the moves loop.
-    const bool canFutilityPrune = (!inCheck && popcount(board->piecetypeBB[ALL_PIECES]) > 6);
+    // Check if pruning is possible in the moves loop.
+    const bool canPrune = (!inCheck && popcount(board->piecetypeBB[ALL_PIECES]) > 6);
     const score_t futilityBase = bestScore + 120;
 
     while ((currmove = movepicker_next_move(&mp, false, 0)) != NO_MOVE)
@@ -935,20 +935,29 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         moveCount++;
 
         bool givesCheck = move_gives_check(board, currmove);
+        bool isQuiet = !is_capture_or_promotion(board, currmove);
+        piece_t movedPiece = piece_on(board, from_sq(currmove));
 
-        // Futility Pruning. If we already have non-mating score and our move
-        // doesn't give check, test if playing it has a chance to make the score
-        // go over alpha.
-        if (bestScore > -MATE_FOUND && canFutilityPrune && !givesCheck
-            && move_type(currmove) == NORMAL_MOVE)
+        if (bestScore > -MATE_FOUND && canPrune)
         {
-            score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
+            // Futility Pruning. If we already have non-mating score and our move
+            // doesn't give check, test if playing it has a chance to make the score
+            // go over alpha.
+            if (!givesCheck && move_type(currmove) == NORMAL_MOVE)
+            {
+                score_t delta =
+                    futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
 
-            // Check if the move is unlikely to improve alpha.
-            if (delta < alpha) continue;
+                // Check if the move is unlikely to improve alpha.
+                if (delta < alpha) continue;
 
-            // If static eval is far below alpha, only search moves that win material.
-            if (futilityBase < alpha && !see_greater_than(board, currmove, 1)) continue;
+                // If static eval is far below alpha, only search moves that win material.
+                if (futilityBase < alpha && !see_greater_than(board, currmove, 1)) continue;
+            }
+
+            if (isQuiet && *(ss - 1)->pieceHistory[movedPiece][to_sq(currmove)] < 0
+                && *(ss - 2)->pieceHistory[movedPiece][to_sq(currmove)] < 0)
+                continue;
         }
 
         // Save the piece history for the current move so that sub-nodes can use
