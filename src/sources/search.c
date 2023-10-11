@@ -524,8 +524,10 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         && !(found && ttDepth >= depth - 3 && ttScore < probCutBeta))
     {
         movepicker_init(&mp, true, board, worker,
-            ttMove && see_greater_than(board, ttMove, probCutBeta - ss->staticEval) ? ttMove
-                                                                                    : NO_MOVE,
+            ttMove && is_capture_or_promotion(board, ttMove)
+                    && see_greater_than(board, ttMove, probCutBeta - ss->staticEval)
+                ? ttMove
+                : NO_MOVE,
             ss);
         move_t currmove;
         while (

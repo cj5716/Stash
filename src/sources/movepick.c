@@ -27,9 +27,7 @@ void movepicker_init(Movepicker *mp, bool inQsearch, const Board *board, const w
     if (board->stack->checkers)
         mp->stage = CHECK_PICK_TT + !(ttMove && move_is_pseudo_legal(board, ttMove));
     else
-        mp->stage = PICK_TT
-                    + !(ttMove && (!inQsearch || is_capture_or_promotion(board, ttMove))
-                        && move_is_pseudo_legal(board, ttMove));
+        mp->stage = PICK_TT + !(ttMove && move_is_pseudo_legal(board, ttMove));
 
     mp->ttMove = ttMove;
     mp->killer1 = ss->killers[0];
@@ -164,8 +162,9 @@ __top:
             {
                 place_top_move(mp->cur, mp->list.last);
 
-                // Only select moves with a positive SEE for this stage.
-                if (mp->cur->move != mp->ttMove && see_greater_than(mp->board, mp->cur->move, see_threshold))
+                // Only select moves with SEE passing the threshold for this stage.
+                if (mp->cur->move != mp->ttMove
+                    && see_greater_than(mp->board, mp->cur->move, see_threshold))
                     return (mp->cur++)->move;
 
                 // Place bad captures further in the list so that we can use
