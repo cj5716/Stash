@@ -74,12 +74,15 @@ int get_conthist_score(const Board *board, const Searchstack *ss, move_t move)
     return history;
 }
 
-int get_history_score(const Board *board, const Worker *worker, const Searchstack *ss, move_t move)
+int get_history_score(
+    const Board *board, const Worker *worker, const Searchstack *ss, move_t move, bool isQuiet)
 {
     const piece_t movedPiece = piece_on(board, from_sq(move));
+    const square_t to = to_sq(move);
 
-    return get_bf_history_score(worker->bfHistory, movedPiece, move)
-           + get_conthist_score(board, ss, move);
+    return isQuiet ? get_bf_history_score(worker->bfHistory, movedPiece, move)
+                     + get_conthist_score(board, ss, move)
+                   : get_cap_history_score(worker->capHistory, movedPiece, to, piece_type(piece_on(board, to)));
 }
 
 uint64_t perft(Board *board, unsigned int depth)
@@ -631,7 +634,7 @@ __main_loop:
         int extension = 0;
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
-        int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
+        int histScore = get_history_score(board, worker, ss, currmove, isQuiet);
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
             && 2 * ss->doubleExtensions < worker->rootDepth)
@@ -715,16 +718,16 @@ __main_loop:
 
                 // Decrease the reduction if the move escapes a capture.
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
-
-                // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -3, 3);
-
-                // Clamp the reduction so that we don't extend the move or drop
-                // immediately into qsearch.
-                R = iclamp(R, 0, newDepth - 1);
             }
             else
                 R = 1;
+
+            // Increase/decrease the reduction based on the move's history.
+            R -= iclamp(histScore / 6000, -3, 3);
+
+            // Clamp the reduction so that we don't extend the move or drop
+            // immediately into qsearch.
+            R = iclamp(R, 0, newDepth - 1);
         }
         else
             R = 0;
