@@ -725,7 +725,12 @@ __main_loop:
                 R = iclamp(R, 0, newDepth - 1);
             }
             else
+            {
                 R = 1;
+
+                // Increase the reduction for bad captures.
+                R += (mp.stage == PICK_BAD_INSTABLE);
+            }
         }
         else
             R = 0;
