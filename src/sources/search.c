@@ -552,6 +552,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
 
             if (probCutScore >= probCutBeta)
             {
+                update_capture_history(board, depth - 3, currmove, NULL, 0, ss);
                 tt_save(entry, key, score_to_tt(probCutScore, ss->plies), ss->staticEval, depth - 3,
                     LOWER_BOUND, currmove);
                 return probCutScore;
