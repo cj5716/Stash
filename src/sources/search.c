@@ -433,7 +433,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     ss->doubleExtensions = (ss - 1)->doubleExtensions;
 
     // Don't perform early pruning or compute the eval while in check.
-    if (inCheck)
+    if (inCheck || ss->excludedMove)
     {
         eval = ss->staticEval = NO_SCORE;
         improving = false;
@@ -475,8 +475,8 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // non-Pawn material on the board, we try to see what happens if we skip our
     // turn. If the resulting reduced search still beats beta, we assume our
     // position is so good that we cannot get under beta at this point.
-    if (!pvNode && depth >= 3 && ss->plies >= worker->verifPlies && !ss->excludedMove
-        && eval >= beta && eval >= ss->staticEval && board->stack->material[board->sideToMove])
+    if (!pvNode && depth >= 3 && ss->plies >= worker->verifPlies && eval >= beta
+        && eval >= ss->staticEval && board->stack->material[board->sideToMove])
     {
         Boardstack stack;
 
