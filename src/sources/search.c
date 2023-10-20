@@ -727,7 +727,7 @@ __main_loop:
                 R = 1;
 
                 // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -1, 1);
+                R -= iclamp(histScore / 3000, -1, 1);
             }
 
             // Clamp the reduction so that we don't extend the move or drop
