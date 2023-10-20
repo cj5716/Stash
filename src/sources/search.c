@@ -82,7 +82,7 @@ int get_history_score(
 
     return isQuiet ? get_bf_history_score(worker->bfHistory, movedPiece, move)
                      + get_conthist_score(board, ss, move)
-                   : get_cap_history_score(worker->capHistory, movedPiece, to, piece_type(piece_on(board, to)));
+                   : get_cap_history_score(worker->capHistory, movedPiece, to, piece_type(piece_on(board, to))) * 2;
 }
 
 uint64_t perft(Board *board, unsigned int depth)
