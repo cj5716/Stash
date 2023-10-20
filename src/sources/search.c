@@ -82,7 +82,7 @@ int get_history_score(
 
     return isQuiet ? get_bf_history_score(worker->bfHistory, movedPiece, move)
                      + get_conthist_score(board, ss, move)
-                   : get_cap_history_score(worker->capHistory, movedPiece, to, piece_type(piece_on(board, to))) * 2;
+                   : get_cap_history_score(worker->capHistory, movedPiece, to, piece_type(piece_on(board, to)));
 }
 
 uint64_t perft(Board *board, unsigned int depth)
@@ -718,12 +718,17 @@ __main_loop:
 
                 // Decrease the reduction if the move escapes a capture.
                 R -= !see_greater_than(board, reverse_move(currmove), 0);
+
+                // Increase/decrease the reduction based on the move's history.
+                R -= iclamp(histScore / 6000, -3, 3);
             }
             else
+            {
                 R = 1;
 
-            // Increase/decrease the reduction based on the move's history.
-            R -= iclamp(histScore / 6000, -3, 3);
+                // Increase/decrease the reduction based on the move's history.
+                R -= iclamp(histScore / 6000, -1, 1);
+            }
 
             // Clamp the reduction so that we don't extend the move or drop
             // immediately into qsearch.
