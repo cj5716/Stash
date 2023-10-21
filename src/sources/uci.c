@@ -616,6 +616,13 @@ void uci_loop(int argc, char **argv)
 
     uci_position("startpos");
 
+    TUNE_DOUBLE(v1, 0, 40);
+    TUNE_DOUBLE(v2, 0, 20);
+    TUNE_DOUBLE(v3, 0, 40);
+    TUNE_DOUBLE(v4, 0, 20);
+    TUNE_LONG(v5, 400, 800);
+    TUNE_LONG(v6, 200, 600);
+
     if (argc > 1)
         for (int i = 1; i < argc; ++i) execute_uci_cmd(argv[i]);
     else

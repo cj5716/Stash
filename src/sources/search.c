@@ -28,13 +28,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int Reductions[256];
+static int Reductions[2][256];
 int Pruning[2][16];
+
+double v1 = 11.35, v2 = 4.35, v3 = 22.70, v4 = 8.70;
+long v5 = 682, v6 = 417;
 
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) Reductions[i] = (int)(log(i) * 22.70 + 8.70);
+    for (int i = 1; i < 256; ++i) 
+    {
+        Reductions[0][i] = (int)(log(i) * v1 + v2); // Noisy LMR formula
+        Reductions[1][i] = (int)(log(i) * v3 + v4); // Quiet LMR formula
+    }
 
     // Compute the LMP movecount values based on depth.
     for (int d = 1; d < 16; ++d)
@@ -44,9 +51,9 @@ void init_search_tables(void)
     }
 }
 
-int lmr_base_value(int depth, int movecount, bool improving)
+int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-682 + Reductions[depth] * Reductions[movecount] + !improving * 417) / 1024;
+    return (-v5 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * v6) / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -151,6 +158,7 @@ void main_worker_search(Worker *worker)
         // node counter, time manager, workers' board and threads, and TT reset.
         tt_clear();
         wpool_new_search(&SearchWorkerPool);
+        init_search_tables();
         timeman_init(board, &SearchTimeman, &UciSearchParams, chess_clock());
 
         if (UciSearchParams.depth == 0) UciSearchParams.depth = MAX_PLIES;
@@ -698,33 +706,28 @@ __main_loop:
         // to produce cutoffs in standard searches.
         if (do_lmr)
         {
-            if (isQuiet)
-            {
-                // Set the base depth reduction value based on depth and
-                // movecount.
-                R = lmr_base_value(depth, moveCount, improving);
+            // Set the base depth reduction value based on depth and
+            // movecount.
+            R = lmr_base_value(depth, moveCount, improving, isQuiet);
 
-                // Increase the reduction for non-PV nodes.
-                R += !pvNode;
+            // Increase the reduction for non-PV nodes.
+            R += !pvNode;
 
-                // Increase the reduction for cutNodes.
-                R += cutNode;
+            // Increase the reduction for cutNodes.
+            R += cutNode;
 
-                // Decrease the reduction if the move is a killer or countermove.
-                R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
+            // Decrease the reduction if the move is a killer or countermove.
+            R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-                // Decrease the reduction if the move escapes a capture.
-                R -= !see_greater_than(board, reverse_move(currmove), 0);
+            // Decrease the reduction if the quiet move escapes a capture.
+            R -= isQuiet && !see_greater_than(board, reverse_move(currmove), 0);
 
-                // Increase/decrease the reduction based on the move's history.
-                R -= iclamp(histScore / 6000, -3, 3);
+            // Increase/decrease the reduction based on the move's history.
+            R -= iclamp(histScore / 6000, -3, 3);
 
-                // Clamp the reduction so that we don't extend the move or drop
-                // immediately into qsearch.
-                R = iclamp(R, 0, newDepth - 1);
-            }
-            else
-                R = 1;
+            // Clamp the reduction so that we don't extend the move or drop
+            // immediately into qsearch.
+            R = iclamp(R, 0, newDepth - 1);
         }
         else
             R = 0;
