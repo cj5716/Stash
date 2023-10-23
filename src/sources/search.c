@@ -36,8 +36,8 @@ void init_search_tables(void)
     // Compute the LMR base values.
     for (int i = 1; i < 256; ++i) 
     {
-        Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
-        Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
+        Reductions[0][i] = (int)(log(i) *  9.47 + 4.03); // Noisy LMR formula
+        Reductions[1][i] = (int)(log(i) * 22.21 + 9.19); // Quiet LMR formula
     }
 
     // Compute the LMP movecount values based on depth.
@@ -50,7 +50,7 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-686 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 411) / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
