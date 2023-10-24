@@ -677,6 +677,19 @@ __main_loop:
                 // in the current node, and return a search score early.
                 else if (singularBeta >= beta)
                     return singularBeta;
+
+                // If the ttScore is greater than beta, we retry singular search
+                // at higher search bounds. If this search fails high, then we can
+                // produce a cutoff in a similar logic to multicut pruning.
+                else if (ttScore >= beta)
+                {
+                    ss->excludedMove = ttMove;
+                    score_t betaScore =
+                        search(false, board, singularDepth, beta - 1, beta, ss, cutNode);
+                    ss->excludedMove = NO_MOVE;
+
+                    if (betaScore >= beta) return betaScore;
+                }
             }
             // Check Extensions. Extend non-LMR searches by one ply for moves
             // that give check.
