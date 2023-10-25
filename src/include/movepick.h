@@ -47,6 +47,7 @@ typedef struct _Movepicker
     Movelist list;
     ExtendedMove *cur, *badCaptures;
     bool inQsearch;
+    int pawnHistKey;
     mp_stage_t stage;
     move_t ttMove;
     move_t killer1;

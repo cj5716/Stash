@@ -48,6 +48,7 @@ void movepicker_init(Movepicker *mp, bool inQsearch, const Board *board, const W
 
     mp->pieceHistory[0] = (ss - 1)->pieceHistory;
     mp->pieceHistory[1] = (ss - 2)->pieceHistory;
+    mp->pawnHistKey = board->stack->pawnKey & 511;
     mp->board = board;
     mp->worker = worker;
 }
@@ -98,9 +99,8 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
         begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
 
         // Also include the pawn history score for the current move.
-        begin->score += get_pawn_history_score(
-                            mp->worker->pawnHistory, mp->board->stack->pawnKey & 511, moved, to)
-                        / 4;
+        begin->score +=
+            get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 4;
 
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
@@ -134,9 +134,8 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
             begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
 
             // Also include the pawn history score for the current move.
-            begin->score += get_pawn_history_score(
-                                mp->worker->pawnHistory, mp->board->stack->pawnKey & 511, moved, to)
-                            / 4;
+            begin->score +=
+                get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 4;
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)
