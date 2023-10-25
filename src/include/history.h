@@ -32,6 +32,7 @@ enum
 typedef int16_t butterfly_history_t[COLOR_NB][SQUARE_NB * SQUARE_NB];
 typedef int16_t piece_history_t[PIECE_NB][SQUARE_NB];
 typedef int16_t capture_history_t[PIECE_NB][SQUARE_NB][PIECETYPE_NB];
+typedef int16_t pawn_history_t[512][PIECE_NB][SQUARE_NB];
 typedef piece_history_t continuation_history_t[PIECE_NB][SQUARE_NB];
 typedef move_t countermove_history_t[PIECE_NB][SQUARE_NB];
 
@@ -83,6 +84,22 @@ INLINED score_t get_cap_history_score(
     const capture_history_t hist, piece_t pc, square_t to, piece_t captured)
 {
     return hist[pc][to][piece_type(captured)] / HistoryScale;
+}
+
+// Updates the pawn history score for the given piece and destination square.
+INLINED void add_pawn_history(
+    pawn_history_t hist, int index, piece_t pc, square_t to, int32_t bonus)
+{
+    int16_t *entry = &hist[index][pc][to];
+
+    *entry += bonus - (int32_t)*entry * abs(bonus) / HistoryResolution;
+}
+
+// Gets the pawn history score for the given piece and destination square.
+INLINED score_t get_pawn_history_score(
+    const pawn_history_t hist, int index, piece_t pc, square_t to)
+{
+    return hist[index][pc][to] / HistoryScale;
 }
 
 #endif // HISTORY_H

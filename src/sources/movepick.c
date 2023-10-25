@@ -97,6 +97,11 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
         // Start by using the butterfly history for ranking quiet moves.
         begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
 
+        // Also include the pawn history score for the current move.
+        begin->score += get_pawn_history_score(
+                            mp->worker->pawnHistory, mp->board->stack->pawnKey & 511, moved, to)
+                        / 4;
+
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
             begin->score += get_pc_history_score(*mp->pieceHistory[0], moved, to);
@@ -127,6 +132,11 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
 
             // Start by using the butterfly history for ranking quiet moves.
             begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
+
+            // Also include the pawn history score for the current move.
+            begin->score += get_pawn_history_score(
+                                mp->worker->pawnHistory, mp->board->stack->pawnKey & 511, moved, to)
+                            / 4;
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)

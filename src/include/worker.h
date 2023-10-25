@@ -73,6 +73,7 @@ typedef struct _Worker
     continuation_history_t ctHistory;
     countermove_history_t cmHistory;
     capture_history_t capHistory;
+    pawn_history_t pawnHistory;
     PawnEntry *pawnTable;
 
     int seldepth;
