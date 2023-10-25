@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -644,7 +645,7 @@ __main_loop:
             // suggests that the TT move is really good, we check if there are
             // other moves which maintain the score close to the TT score. If
             // that's not the case, we consider the TT move to be singular, and
-            // we extend non-LMR searches by one or two lies, depending on the
+            // we extend it by one or two lies, depending on the
             // margin that the singular search failed low.
             if (depth >= 7 && currmove == ttMove && !ss->excludedMove && (ttBound & LOWER_BOUND)
                 && abs(ttScore) < VICTORY && ttDepth >= depth - 3)
@@ -679,8 +680,8 @@ __main_loop:
                     return singularBeta;
 
                 // If the ttScore is greater than beta, we retry singular search
-                // at higher search bounds. If this search fails high, then we can
-                // produce a cutoff in a similar logic to multicut pruning.
+                // at higher search bounds. If this search fails high, then it is
+                // likely that the ttMove is non-singular and thus we reduce it.
                 else if (ttScore >= beta)
                 {
                     ss->excludedMove = ttMove;
@@ -688,16 +689,18 @@ __main_loop:
                         search(false, board, singularDepth + 2, beta - 1, beta, ss, cutNode);
                     ss->excludedMove = NO_MOVE;
 
-                    if (betaScore >= beta) return betaScore;
+                    if (betaScore >= beta) extension = -2;
                 }
             }
-            // Check Extensions. Extend non-LMR searches by one ply for moves
+            // Check Extensions. Extend search by one ply for moves
             // that give check.
             else if (givesCheck)
                 extension = 1;
         }
 
         piece_t movedPiece = piece_on(board, from_sq(currmove));
+
+        newDepth += extension;
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
@@ -742,8 +745,6 @@ __main_loop:
             R = 0;
 
         if (do_lmr) score = -search(false, board, newDepth - R, -alpha - 1, -alpha, ss + 1, true);
-
-        newDepth += extension;
 
         // If LMR is not possible, or our LMR failed, do a search with no
         // reductions.
