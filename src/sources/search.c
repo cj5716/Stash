@@ -685,7 +685,7 @@ __main_loop:
                 {
                     ss->excludedMove = ttMove;
                     score_t betaScore =
-                        search(false, board, singularDepth, beta - 1, beta, ss, cutNode);
+                        search(false, board, singularDepth + 2, beta - 1, beta, ss, cutNode);
                     ss->excludedMove = NO_MOVE;
 
                     if (betaScore >= beta) return betaScore;
