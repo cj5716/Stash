@@ -57,6 +57,8 @@ const scorepair_t PP_TheirKingProximity[8] = {
     SPAIR(  -2,  24)
 };
 
+const scorepair_t PP_Protected    = SPAIR(   5,  20);
+
 // King Safety eval terms
 const scorepair_t KnightWeight    = SPAIR(  39,   8);
 const scorepair_t BishopWeight    = SPAIR(  22,  17);
@@ -614,6 +616,9 @@ scorepair_t evaluate_passed_pos(const Board *board, const PawnEntry *entry, colo
 
         ret += PP_OurKingProximity[ourDistance];
         ret += PP_TheirKingProximity[theirDistance];
+
+        // Give a bonus for protected passed pawns.
+        if (pawn_moves(sq, not_color(us)) & piece_bb(board, us, PAWN)) ret += PP_Protected;
 
         TRACE_ADD(IDX_PP_OUR_KING_PROX + ourDistance - 1, us, 1);
         TRACE_ADD(IDX_PP_THEIR_KING_PROX + theirDistance - 1, us, 1);
