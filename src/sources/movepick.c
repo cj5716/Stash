@@ -123,7 +123,7 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
 
             // Place captures of the checking piece at the top of the list using
             // MVV/LVA ordering.
-            begin->score = 99999 + captured * 8 - moved;
+            begin->score = 999999 + captured * 8 - moved;
         }
         else
         {
