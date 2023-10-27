@@ -100,7 +100,7 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
 
         // Also include the pawn history score for the current move.
         begin->score +=
-            get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 4;
+            get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 2;
 
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
@@ -135,7 +135,7 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
 
             // Also include the pawn history score for the current move.
             begin->score +=
-                get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 4;
+                get_pawn_history_score(mp->worker->pawnHistory, mp->pawnHistKey, moved, to) / 2;
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)
