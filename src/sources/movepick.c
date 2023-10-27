@@ -19,7 +19,7 @@
 #include "movepick.h"
 
 void movepicker_init(Movepicker *mp, bool inQsearch, const Board *board, const Worker *worker,
-    move_t ttMove, Searchstack *ss)
+    const bitboard_t oppThreats, move_t ttMove, Searchstack *ss)
 {
     mp->inQsearch = inQsearch;
 
@@ -48,6 +48,7 @@ void movepicker_init(Movepicker *mp, bool inQsearch, const Board *board, const W
 
     mp->pieceHistory[0] = (ss - 1)->pieceHistory;
     mp->pieceHistory[1] = (ss - 2)->pieceHistory;
+    mp->oppThreats = oppThreats;
     mp->board = board;
     mp->worker = worker;
 }
@@ -95,7 +96,8 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
         square_t to = to_sq(begin->move);
 
         // Start by using the butterfly history for ranking quiet moves.
-        begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
+        begin->score =
+            get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move) / 2;
 
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
@@ -126,7 +128,8 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
             square_t to = to_sq(begin->move);
 
             // Start by using the butterfly history for ranking quiet moves.
-            begin->score = get_bf_history_score(mp->worker->bfHistory, moved, begin->move) / 2;
+            begin->score =
+                get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move) / 2;
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)

@@ -54,12 +54,13 @@ typedef struct _Movepicker
     move_t counter;
     const Board *board;
     const Worker *worker;
+    bitboard_t oppThreats;
     piece_history_t *pieceHistory[2];
 } Movepicker;
 
 // Initializes the move picker.
 void movepicker_init(Movepicker *mp, bool inQsearch, const Board *board, const Worker *worker,
-    move_t ttMove, Searchstack *ss);
+    const bitboard_t oppThreats, move_t ttMove, Searchstack *ss);
 
 // Returns the next move in the move picker, with the option to skip quiet moves.
 move_t movepicker_next_move(Movepicker *mp, bool skipQuiets, int see_threshold);

@@ -48,7 +48,7 @@ void update_cont_histories(Searchstack *ss, int depth, piece_t piece, square_t t
 
 // Updates the quiet history for the bestmove and all failed quiets.
 void update_quiet_history(const Board *board, int depth, move_t bestmove, const move_t quiets[64],
-    int qcount, Searchstack *ss);
+    int qcount, bitboard_t oppThreats, Searchstack *ss);
 
 // Updates the capture history for the bestmove and all failed captures.
 void update_capture_history(const Board *board, int depth, move_t bestmove,

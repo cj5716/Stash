@@ -32,7 +32,7 @@ void update_cont_histories(Searchstack *ss, int depth, piece_t piece, square_t t
 }
 
 void update_quiet_history(const Board *board, int depth, move_t bestmove, const move_t quiets[64],
-    int qcount, Searchstack *ss)
+    int qcount, bitboard_t oppThreats, Searchstack *ss)
 {
     butterfly_history_t *bfHist = &get_worker(board)->bfHistory;
     square_t to;
@@ -52,7 +52,7 @@ void update_quiet_history(const Board *board, int depth, move_t bestmove, const 
         get_worker(board)->cmHistory[lastPiece][lastTo] = bestmove;
     }
 
-    add_bf_history(*bfHist, piece, bestmove, bonus);
+    add_bf_history(*bfHist, piece, bestmove, oppThreats, bonus);
     update_cont_histories(ss, depth, piece, to, true);
 
     // Set the bestmove as a killer.
@@ -68,7 +68,7 @@ void update_quiet_history(const Board *board, int depth, move_t bestmove, const 
         piece = piece_on(board, from_sq(quiets[i]));
         to = to_sq(quiets[i]);
 
-        add_bf_history(*bfHist, piece, quiets[i], -bonus);
+        add_bf_history(*bfHist, piece, quiets[i], oppThreats, -bonus);
         update_cont_histories(ss, depth, piece, to, false);
     }
 }

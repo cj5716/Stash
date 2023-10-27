@@ -19,6 +19,7 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
+#include "bitboard.h"
 #include "types.h"
 #include <stdlib.h>
 
@@ -29,7 +30,7 @@ enum
     HistoryResolution = HistoryMaxScore * HistoryScale
 };
 
-typedef int16_t butterfly_history_t[COLOR_NB][SQUARE_NB * SQUARE_NB];
+typedef int16_t butterfly_history_t[COLOR_NB][2][SQUARE_NB * SQUARE_NB];
 typedef int16_t piece_history_t[PIECE_NB][SQUARE_NB];
 typedef int16_t capture_history_t[PIECE_NB][SQUARE_NB][PIECETYPE_NB];
 typedef piece_history_t continuation_history_t[PIECE_NB][SQUARE_NB];
@@ -42,17 +43,21 @@ INLINED int history_bonus(int depth)
 }
 
 // Updates the butterfly history table for the given piece and move.
-INLINED void add_bf_history(butterfly_history_t hist, piece_t piece, move_t move, int32_t bonus)
+INLINED void add_bf_history(
+    butterfly_history_t hist, piece_t piece, move_t move, bitboard_t oppThreats, int32_t bonus)
 {
-    int16_t *entry = &hist[piece_color(piece)][square_mask(move)];
+    int16_t *entry =
+        &hist[!!(oppThreats & square_bb(to_sq(move)))][piece_color(piece)][square_mask(move)];
 
     *entry += bonus - (int32_t)*entry * abs(bonus) / HistoryResolution;
 }
 
 // Gets the butterfly history bonus for the given piece and move.
-INLINED score_t get_bf_history_score(const butterfly_history_t hist, piece_t piece, move_t move)
+INLINED score_t get_bf_history_score(
+    const butterfly_history_t hist, piece_t piece, const bitboard_t oppThreats, move_t move)
 {
-    return hist[piece_color(piece)][square_mask(move)] / HistoryScale;
+    return hist[piece_color(piece)][!!(oppThreats & square_bb(to_sq(move)))][square_mask(move)]
+           / HistoryScale;
 }
 
 // Updates the piece history table for the given piece and destination square.

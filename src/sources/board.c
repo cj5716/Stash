@@ -1309,3 +1309,50 @@ bool see_greater_than(const Board *board, move_t m, score_t threshold)
     }
     return result;
 }
+
+bitboard_t threats(const Board *board, const color_t c)
+{
+    bitboard_t attacks_bb, bb, occupancy;
+    occupancy = occupancy_bb(board);
+
+    // Pawns
+    attacks_bb = (c == WHITE) ? wpawns_attacks_bb(piece_bb(board, WHITE, PAWN))
+                              : bpawns_attacks_bb(piece_bb(board, BLACK, PAWN));
+
+    // Knights
+    bb = piece_bb(board, c, KNIGHT);
+    while (bb)
+    {
+        square_t sq = bb_pop_first_sq(&bb);
+        attacks_bb |= knight_moves(sq);
+    }
+
+    // Bishops
+    bb = piece_bb(board, c, BISHOP);
+    while (bb)
+    {
+        square_t sq = bb_pop_first_sq(&bb);
+        attacks_bb |= bishop_moves_bb(sq, occupancy);
+    }
+
+    // Rooks
+    bb = piece_bb(board, c, ROOK);
+    while (bb)
+    {
+        square_t sq = bb_pop_first_sq(&bb);
+        attacks_bb |= rook_moves_bb(sq, occupancy);
+    }
+
+    // Queens
+    bb = piece_bb(board, c, QUEEN);
+    while (bb)
+    {
+        square_t sq = bb_pop_first_sq(&bb);
+        attacks_bb |= bishop_moves_bb(sq, occupancy) | rook_moves_bb(sq, occupancy);
+    }
+
+    // Kings
+    attacks_bb |= king_moves(get_king_square(board, c));
+
+    return attacks_bb;
+}

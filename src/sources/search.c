@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -78,11 +79,12 @@ int get_conthist_score(const Board *board, const Searchstack *ss, move_t move)
     return history;
 }
 
-int get_history_score(const Board *board, const Worker *worker, const Searchstack *ss, move_t move)
+int get_history_score(const Board *board, const Worker *worker, const Searchstack *ss,
+    const bitboard_t oppThreats, move_t move)
 {
     const piece_t movedPiece = piece_on(board, from_sq(move));
 
-    return get_bf_history_score(worker->bfHistory, movedPiece, move)
+    return get_bf_history_score(worker->bfHistory, movedPiece, oppThreats, move)
            + get_conthist_score(board, ss, move);
 }
 
@@ -411,6 +413,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     bool found;
     hashkey_t key = board->stack->boardKey ^ ((hashkey_t)ss->excludedMove << 16);
     TT_Entry *entry = tt_probe(key, &found);
+    bitboard_t oppThreats;
     score_t eval;
     score_t probCutBeta;
 
@@ -427,7 +430,10 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
                 if ((ttBound & LOWER_BOUND) && !is_capture_or_promotion(board, ttMove))
-                    update_quiet_history(board, depth, ttMove, NULL, 0, ss);
+                {
+                    oppThreats = threats(board, not_color(board->sideToMove));
+                    update_quiet_history(board, depth, ttMove, NULL, 0, oppThreats, ss);
+                }
 
                 return ttScore;
             }
@@ -435,6 +441,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
 
     (ss + 2)->killers[0] = (ss + 2)->killers[1] = NO_MOVE;
     ss->doubleExtensions = (ss - 1)->doubleExtensions;
+    oppThreats = threats(board, not_color(board->sideToMove));
 
     // Don't perform early pruning or compute the eval while in check.
     if (inCheck)
@@ -529,7 +536,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         movepicker_init(&mp, true, board, worker,
             ttMove && see_greater_than(board, ttMove, probCutBeta - ss->staticEval) ? ttMove
                                                                                     : NO_MOVE,
-            ss);
+            oppThreats, ss);
         move_t currmove;
         while (
             (currmove = movepicker_next_move(&mp, false, probCutBeta - ss->staticEval)) != NO_MOVE)
@@ -567,7 +574,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     if (!rootNode && !found && depth >= 4) --depth;
 
 __main_loop:
-    movepicker_init(&mp, false, board, worker, ttMove, ss);
+    movepicker_init(&mp, false, board, worker, oppThreats, ttMove, ss);
 
     move_t currmove;
     move_t bestmove = NO_MOVE;
@@ -635,7 +642,7 @@ __main_loop:
         int extension = 0;
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
-        int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
+        int histScore = isQuiet ? get_history_score(board, worker, ss, oppThreats, currmove) : 0;
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
             && 2 * ss->doubleExtensions < worker->rootDepth)
@@ -794,7 +801,9 @@ __main_loop:
                 if (alpha >= beta)
                 {
                     // Update move histories.
-                    if (isQuiet) update_quiet_history(board, depth, bestmove, quiets, qcount, ss);
+                    if (isQuiet)
+                        update_quiet_history(
+                            board, depth, bestmove, quiets, qcount, oppThreats, ss);
                     if (moveCount != 1)
                         update_capture_history(board, depth, bestmove, captures, ccount, ss);
                     break;
@@ -911,7 +920,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
     move_t ttMove = entry->bestmove;
 
-    movepicker_init(&mp, true, board, worker, ttMove, ss);
+    movepicker_init(&mp, true, board, worker, (bitboard_t)0, ttMove, ss);
 
     move_t currmove;
     move_t bestmove = NO_MOVE;
