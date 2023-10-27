@@ -97,7 +97,7 @@ static void score_quiet(Movepicker *mp, ExtendedMove *begin, ExtendedMove *end)
 
         // Start by using the butterfly history for ranking quiet moves.
         begin->score =
-            get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move) / 2;
+            get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move);
 
         // Try using the countermove and followup histories if they exist.
         if (mp->pieceHistory[0] != NULL)
@@ -129,7 +129,7 @@ static void score_evasions(Movepicker *mp, ExtendedMove *begin, ExtendedMove *en
 
             // Start by using the butterfly history for ranking quiet moves.
             begin->score =
-                get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move) / 2;
+                get_bf_history_score(mp->worker->bfHistory, moved, mp->oppThreats, begin->move);
 
             // Try using the countermove and followup histories if they exist.
             if (mp->pieceHistory[0] != NULL)
