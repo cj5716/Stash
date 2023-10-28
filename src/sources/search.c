@@ -608,7 +608,7 @@ __main_loop:
 
             // Futility Pruning. For low-depth nodes, stop searching quiets if
             // the eval suggests that only captures will save the day.
-            if (lmrDepth <= 6 && !inCheck && isQuiet && eval + 217 + 71 * lmrDepth <= alpha)
+            if (depth <= 6 && !inCheck && isQuiet && eval + 217 + 71 * depth <= alpha)
                 skipQuiets = true;
 
             // Continuation History Pruning. For low-depth nodes, prune quiet moves if
