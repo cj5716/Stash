@@ -57,6 +57,8 @@ const scorepair_t PP_TheirKingProximity[8] = {
     SPAIR(  -2,  24)
 };
 
+const scorepair_t PP_PassedSquare = SPAIR(  0,  200);
+
 // King Safety eval terms
 const scorepair_t KnightWeight    = SPAIR(  39,   8);
 const scorepair_t BishopWeight    = SPAIR(  22,  17);
@@ -606,6 +608,7 @@ scorepair_t evaluate_passed_pos(const Board *board, const PawnEntry *entry, colo
     while (bb)
     {
         square_t sq = bb_pop_first_sq(&bb);
+        square_t promoSq = create_sq(sq_file(sq), relative_rank(RANK_8, us));
 
         // Give a bonus/penalty based on how close our King and their King are
         // from the Pawn.
@@ -614,6 +617,13 @@ scorepair_t evaluate_passed_pos(const Board *board, const PawnEntry *entry, colo
 
         ret += PP_OurKingProximity[ourDistance];
         ret += PP_TheirKingProximity[theirDistance];
+
+        // Square rule. If the opponent does not have any non-pawn material and
+        // their king cannot stop our pawn from promoting, give a bonus.
+        if (!board->stack->material[not_color(us)]
+            && SquareDistance[sq][promoSq]
+                   < SquareDistance[theirKing][promoSq] - (us != board->sideToMove))
+            ret += PP_PassedSquare;
 
         TRACE_ADD(IDX_PP_OUR_KING_PROX + ourDistance - 1, us, 1);
         TRACE_ADD(IDX_PP_THEIR_KING_PROX + theirDistance - 1, us, 1);
