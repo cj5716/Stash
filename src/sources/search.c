@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -715,8 +716,11 @@ __main_loop:
             // Decrease the reduction if the move is a killer or countermove.
             R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
-            // Decrease the reduction if the move escapes a capture.
+            // Decrease the reduction if the quiet move escapes a capture.
             R -= isQuiet && !see_greater_than(board, reverse_move(currmove), 0);
+
+            // Decrease the reduction for moves that give check.
+            R -= givesCheck;
 
             // Increase/decrease the reduction based on the move's history.
             R -= iclamp(histScore / 6000, -3, 3);
