@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -401,6 +402,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     }
 
     bool inCheck = !!board->stack->checkers;
+    bool bestmoveIsQuiet = false;
     bool improving;
 
     // Check for interesting TT values.
@@ -784,6 +786,7 @@ __main_loop:
             if (alpha < bestScore)
             {
                 bestmove = currmove;
+                bestmoveIsQuiet = isQuiet;
                 alpha = bestScore;
 
                 // Update the PV for PV nodes.
@@ -791,14 +794,7 @@ __main_loop:
 
                 // Check if our move generates a cutoff, in which case we can
                 // stop searching other moves at this node.
-                if (alpha >= beta)
-                {
-                    // Update move histories.
-                    if (isQuiet) update_quiet_history(board, depth, bestmove, quiets, qcount, ss);
-                    if (moveCount != 1)
-                        update_capture_history(board, depth, bestmove, captures, ccount, ss);
-                    break;
-                }
+                if (alpha >= beta) break;
             }
         }
 
@@ -813,6 +809,13 @@ __main_loop:
     // or mate score in singular searches.
     if (moveCount == 0)
         bestScore = (ss->excludedMove) ? alpha : (board->stack->checkers) ? mated_in(ss->plies) : 0;
+
+    else if (bestmove)
+    {
+        // Update move histories.
+        if (bestmoveIsQuiet) update_quiet_history(board, depth, bestmove, quiets, qcount, ss);
+        if (moveCount != 1) update_capture_history(board, depth, bestmove, captures, ccount, ss);
+    }
 
     // Only save TT for the first MultiPV move in root nodes.
     if (!rootNode || worker->pvLine == 0)

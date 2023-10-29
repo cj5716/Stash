@@ -65,6 +65,7 @@ void update_quiet_history(const Board *board, int depth, move_t bestmove, const 
     // Apply history penalties to all previous failing quiet moves.
     for (int i = 0; i < qcount; ++i)
     {
+        if (quiets[i] == bestmove) continue;
         piece = piece_on(board, from_sq(quiets[i]));
         to = to_sq(quiets[i]);
 
@@ -100,5 +101,9 @@ void update_capture_history(const Board *board, int depth, move_t bestmove,
         update_single_capture(capHist, board, bestmove, bonus);
 
     // Apply history penalties to all previous failing capture moves.
-    for (int i = 0; i < ccount; ++i) update_single_capture(capHist, board, captures[i], -bonus);
+    for (int i = 0; i < ccount; ++i)
+    {
+        if (captures[i] == bestmove) continue;
+        update_single_capture(capHist, board, captures[i], -bonus);
+    }
 }
