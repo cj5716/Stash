@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -610,7 +611,9 @@ __main_loop:
 
             // Continuation History Pruning. For low-depth nodes, prune quiet moves if
             // they seem to be bad continuations to the previous moves.
-            if (depth <= 3 && get_conthist_score(board, ss, currmove) < -4030 * (depth - 1) + 24)
+            if (depth <= 3 && isQuiet
+                && !(currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter)
+                && get_conthist_score(board, ss, currmove) < -4030 * (depth - 1) + 24)
                 continue;
 
             // SEE Pruning. For low-depth nodes, don't search moves which seem
