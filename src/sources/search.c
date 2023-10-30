@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -540,7 +541,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
 
             ss->currentMove = currmove;
             ss->pieceHistory =
-                &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)];
+                &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)][false];
 
             Boardstack stack;
             bool givesCheck = move_gives_check(board, currmove);
@@ -689,7 +690,7 @@ __main_loop:
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)];
+        ss->pieceHistory = &worker->ctHistory[movedPiece][to_sq(currmove)][isQuiet];
 
         do_move_gc(board, currmove, &stack, givesCheck);
         atomic_fetch_add_explicit(&get_worker(board)->nodes, 1, memory_order_relaxed);
@@ -933,6 +934,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         moveCount++;
 
         bool givesCheck = move_gives_check(board, currmove);
+        bool isQuiet = !is_capture_or_promotion(board, currmove);
 
         // Futility Pruning. If we already have non-mating score and our move
         // doesn't give check, test if playing it has a chance to make the score
@@ -952,7 +954,8 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
         ss->currentMove = currmove;
-        ss->pieceHistory = &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)];
+        ss->pieceHistory =
+            &worker->ctHistory[piece_on(board, from_sq(currmove))][to_sq(currmove)][isQuiet];
 
         Boardstack stack;
 
