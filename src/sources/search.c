@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -409,7 +410,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     score_t ttScore = NO_SCORE;
     move_t ttMove = NO_MOVE;
     bool found;
-    hashkey_t key = board->stack->boardKey ^ ((hashkey_t)ss->excludedMove << 16);
+    hashkey_t key = board->stack->boardKey;
     TT_Entry *entry = tt_probe(key, &found);
     score_t eval;
     score_t probCutBeta;
@@ -422,7 +423,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         ttMove = entry->bestmove;
 
         // Check if we can directly return a score for non-PV nodes.
-        if (ttDepth >= depth && !pvNode)
+        if (ttDepth >= depth && !pvNode && !ss->excludedMove)
             if (((ttBound & LOWER_BOUND) && ttScore >= beta)
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
@@ -433,6 +434,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
             }
     }
 
+    (ss + 1)->excludedMove = NO_MOVE;
     (ss + 2)->killers[0] = (ss + 2)->killers[1] = NO_MOVE;
     ss->doubleExtensions = (ss - 1)->doubleExtensions;
 
@@ -536,7 +538,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         {
             if (mp.stage == PICK_BAD_INSTABLE) break;
 
-            if (!move_is_legal(board, currmove) || currmove == ss->excludedMove) continue;
+            if (currmove == ss->excludedMove || !move_is_legal(board, currmove)) continue;
 
             ss->currentMove = currmove;
             ss->pieceHistory =
@@ -815,7 +817,7 @@ __main_loop:
         bestScore = (ss->excludedMove) ? alpha : (board->stack->checkers) ? mated_in(ss->plies) : 0;
 
     // Only save TT for the first MultiPV move in root nodes.
-    if (!rootNode || worker->pvLine == 0)
+    if (!ss->excludedMove && (!rootNode || worker->pvLine == 0))
     {
         int bound = (bestScore >= beta)    ? LOWER_BOUND
                     : (pvNode && bestmove) ? EXACT_BOUND
