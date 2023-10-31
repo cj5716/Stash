@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -524,7 +525,15 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // value much above beta, we can (almost) safely prune the previous move.
     probCutBeta = beta + 128;
     if (depth >= 4 && abs(beta) < VICTORY
-        && !(found && ttDepth >= depth - 3 && ttScore < probCutBeta))
+        && !(found && ttDepth >= depth - 3 && ttScore < probCutBeta)
+        // Only allow probcut if:
+        // 1. En Passant is possible
+        // 2. Promotion is possible
+        // 3. Capture is possible
+        && (board->stack->enPassantSquare
+            || (board->piecetypeBB[PAWN] & board->colorBB[board->sideToMove]
+                & relative_rank(RANK_7, board->sideToMove))
+            || (threats(board, board->sideToMove) & board->colorBB[not_color(board->sideToMove)])))
     {
         movepicker_init(&mp, true, board, worker,
             ttMove && see_greater_than(board, ttMove, probCutBeta - ss->staticEval) ? ttMove

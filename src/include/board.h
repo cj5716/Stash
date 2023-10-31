@@ -107,6 +107,9 @@ bool move_gives_check(const Board *board, move_t move);
 // given threshold.
 bool see_greater_than(const Board *board, move_t move, score_t threshold);
 
+// Calculates all squares attacked from a given side.
+bitboard_t threats(const Board *board, const color_t c);
+
 // Initializes the board from the given FEN string.
 int board_from_fen(Board *board, const char *fen, bool isChess960, Boardstack *bstack);
 
