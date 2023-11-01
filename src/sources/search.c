@@ -403,6 +403,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
 
     bool inCheck = !!board->stack->checkers;
     bool improving;
+    color_t us = board->sideToMove;
 
     // Check for interesting TT values.
     int ttDepth = 0;
@@ -414,6 +415,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     TT_Entry *entry = tt_probe(key, &found);
     score_t eval;
     score_t probCutBeta;
+    bitboard_t ourPawns;
 
     if (found)
     {
@@ -481,7 +483,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // turn. If the resulting reduced search still beats beta, we assume our
     // position is so good that we cannot get under beta at this point.
     if (!pvNode && depth >= 3 && ss->plies >= worker->verifPlies && !ss->excludedMove
-        && eval >= beta && eval >= ss->staticEval && board->stack->material[board->sideToMove])
+        && eval >= beta && eval >= ss->staticEval && board->stack->material[us])
     {
         Boardstack stack;
 
@@ -524,16 +526,17 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // Probcut. If we have a good enough capture (or promotion) and a reduced search returns a
     // value much above beta, we can (almost) safely prune the previous move.
     probCutBeta = beta + 128;
+    ourPawns = piece_bb(board, us, PAWN);
     if (depth >= 4 && abs(beta) < VICTORY
         && !(found && ttDepth >= depth - 3 && ttScore < probCutBeta)
         // Only allow probcut if:
-        // 1. En Passant is possible
-        // 2. Promotion is possible
+        // 1. Promotion is possible
+        // 2. En Passant is possible
         // 3. Capture is possible
-        && (board->stack->enPassantSquare
-            || (board->piecetypeBB[PAWN] & board->colorBB[board->sideToMove]
-                & relative_rank(RANK_7, board->sideToMove))
-            || (threats(board, board->sideToMove) & board->colorBB[not_color(board->sideToMove)])))
+        && ((ourPawns & rank_bb(relative_rank(RANK_7, us)))
+            || (board->stack->enPassantSquare != SQ_NONE
+                && (pawn_moves(board->stack->enPassantSquare, not_color(us)) & ourPawns))
+            || (threats(board, us) & color_bb(board, not_color(us)))))
     {
         movepicker_init(&mp, true, board, worker,
             ttMove && see_greater_than(board, ttMove, probCutBeta - ss->staticEval) ? ttMove
