@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -363,15 +364,15 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     bool rootNode = (ss->plies == 0);
     Worker *worker = get_worker(board);
 
+    // Drop into qsearch if the depth isn't strictly positive.
+    if (depth <= 0) return qsearch(pvNode, board, alpha, beta, ss);
+
     // Perform an early check for repetition detections.
     if (!rootNode && board->stack->rule50 >= 3 && alpha < 0 && game_has_cycle(board, ss->plies))
     {
         alpha = draw_score(worker);
         if (alpha >= beta) return alpha;
     }
-
-    // Drop into qsearch if the depth isn't strictly positive.
-    if (depth <= 0) return qsearch(pvNode, board, alpha, beta, ss);
 
     Movepicker mp;
     move_t pv[256];
@@ -834,6 +835,13 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
     const score_t oldAlpha = alpha;
     Movepicker mp;
     move_t pv[256];
+
+    // Perform an early check for repetition detections.
+    if (board->stack->rule50 >= 3 && alpha < 0 && game_has_cycle(board, ss->plies))
+    {
+        alpha = draw_score(worker);
+        if (alpha >= beta) return alpha;
+    }
 
     // Verify the time usage if we're the main thread.
     if (!worker->idx) check_time();
