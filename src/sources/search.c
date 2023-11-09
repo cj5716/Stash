@@ -34,7 +34,7 @@ int Pruning[2][16];
 void init_search_tables(void)
 {
     // Compute the LMR base values.
-    for (int i = 1; i < 256; ++i) 
+    for (int i = 1; i < 256; ++i)
     {
         Reductions[0][i] = (int)(log(i) * 11.17 + 4.21); // Noisy LMR formula
         Reductions[1][i] = (int)(log(i) * 23.12 + 8.20); // Quiet LMR formula
@@ -50,7 +50,8 @@ void init_search_tables(void)
 
 int lmr_base_value(int depth, int movecount, bool improving, bool isQuiet)
 {
-    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416) / 1024;
+    return (-685 + Reductions[isQuiet][depth] * Reductions[isQuiet][movecount] + !improving * 416)
+           / 1024;
 }
 
 void init_searchstack(Searchstack *ss)
@@ -596,6 +597,7 @@ __main_loop:
         moveCount++;
 
         bool isQuiet = !is_capture_or_promotion(board, currmove);
+        bool givesCheck = move_gives_check(board, currmove);
 
         if (!rootNode && bestScore > -MATE_FOUND)
         {
@@ -603,10 +605,12 @@ __main_loop:
             // after a certain movecount has been reached.
             if (depth <= 6 && moveCount > Pruning[improving][depth]) skipQuiets = true;
 
-            // Futility Pruning. For low-depth nodes, stop searching quiets if
-            // the eval suggests that only captures will save the day.
-            if (depth <= 6 && !inCheck && isQuiet && eval + 217 + 71 * depth <= alpha)
-                skipQuiets = true;
+            // Futility Pruning. For low-depth nodes, skip searching quiets
+            // that don't give check if the eval suggests that only captures
+            // will save the day.
+            if (depth <= 6 && !givesCheck && !inCheck && isQuiet
+                && eval + 217 + 71 * depth <= alpha)
+                continue;
 
             // Continuation History Pruning. For low-depth nodes, prune quiet moves if
             // they seem to be bad continuations to the previous moves.
@@ -634,7 +638,6 @@ __main_loop:
         int R;
         int extension = 0;
         int newDepth = depth - 1;
-        bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
