@@ -872,18 +872,15 @@ score_t evaluate(const Board *board)
 
     // Compute the evaluation by interpolating between the middlegame and
     // endgame scores.
-    {
-        int phase = 4 * popcount(piecetype_bb(board, QUEEN))
-                    + 2 * popcount(piecetype_bb(board, ROOK))
-                    + popcount(piecetypes_bb(board, KNIGHT, BISHOP));
+    int phase = 4 * popcount(piecetype_bb(board, QUEEN)) + 2 * popcount(piecetype_bb(board, ROOK))
+                + popcount(piecetypes_bb(board, KNIGHT, BISHOP));
 
-        phase = iclamp(phase, ENDGAME_COUNT, MIDGAME_COUNT);
+    phase = iclamp(phase, ENDGAME_COUNT, MIDGAME_COUNT);
 
-        score = mg * (phase - ENDGAME_COUNT) / (MIDGAME_COUNT - ENDGAME_COUNT);
-        score += eg * (MIDGAME_COUNT - phase) / (MIDGAME_COUNT - ENDGAME_COUNT);
+    score = (mg * (phase - ENDGAME_COUNT) + eg * (MIDGAME_COUNT - phase))
+            / (MIDGAME_COUNT - ENDGAME_COUNT);
 
-        TRACE_PHASE(phase);
-    }
+    TRACE_PHASE(phase);
 
     // Return the score relative to the side to move.
     return board->sideToMove == WHITE ? score : -score;
