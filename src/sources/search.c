@@ -410,7 +410,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     score_t ttScore = NO_SCORE;
     move_t ttMove = NO_MOVE;
     bool found;
-    hashkey_t key = board->stack->boardKey ^ ((hashkey_t)ss->excludedMove << 16);
+    hashkey_t key = board->stack->boardKey;
     TT_Entry *entry = tt_probe(key, &found);
     score_t eval;
     score_t probCutBeta;
@@ -423,7 +423,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         ttMove = entry->bestmove;
 
         // Check if we can directly return a score for non-PV nodes.
-        if (ttDepth >= depth && !pvNode)
+        if (ttDepth >= depth && !pvNode && !ss->excludedMove)
             if (((ttBound & LOWER_BOUND) && ttScore >= beta)
                 || ((ttBound & UPPER_BOUND) && ttScore <= alpha))
             {
@@ -444,6 +444,8 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
         improving = false;
         goto __main_loop;
     }
+    else if (ss->excludedMove)
+        eval = ss->staticEval;
     // Use the TT stored information for getting an eval.
     else if (found)
     {
@@ -565,7 +567,7 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     }
 
     // Reduce depth if the node is absent from TT.
-    if (!rootNode && !found && depth >= 4) --depth;
+    if (!rootNode && !ss->excludedMove && !found && depth >= 4) --depth;
 
 __main_loop:
     movepicker_init(&mp, false, board, worker, ttMove, ss);
@@ -589,10 +591,8 @@ __main_loop:
                 == NULL)
                 continue;
         }
-        else
-        {
-            if (!move_is_legal(board, currmove) || currmove == ss->excludedMove) continue;
-        }
+        else if (!move_is_legal(board, currmove) || currmove == ss->excludedMove)
+            continue;
 
         moveCount++;
 
@@ -816,7 +816,7 @@ __main_loop:
         bestScore = (ss->excludedMove) ? alpha : (board->stack->checkers) ? mated_in(ss->plies) : 0;
 
     // Only save TT for the first MultiPV move in root nodes.
-    if (!rootNode || worker->pvLine == 0)
+    if ((!rootNode || worker->pvLine == 0) && !ss->excludedMove)
     {
         int bound = (bestScore >= beta)    ? LOWER_BOUND
                     : (pvNode && bestmove) ? EXACT_BOUND
