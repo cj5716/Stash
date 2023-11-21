@@ -921,15 +921,14 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
 
     if (pvNode) (ss + 1)->pv = pv;
 
-    // Check if Futility Pruning is possible in the moves loop.
-    const bool lowPieceCount = popcount(board->piecetypeBB[ALL_PIECES]) <= 6;
-    const bool canFutilityPrune = !inCheck && !lowPieceCount;
+    // Check if pruning is possible in the moves loop.
+    const bool canPrune = (!inCheck && popcount(board->piecetypeBB[ALL_PIECES]) > 6);
     const score_t futilityBase = bestScore + 120;
 
     while ((currmove = movepicker_next_move(&mp, false, 0)) != NO_MOVE)
     {
         // Only analyse good capture moves.
-        if (bestScore > -MATE_FOUND && !lowPieceCount && mp.stage == PICK_BAD_INSTABLE) break;
+        if (bestScore > -MATE_FOUND && canPrune && mp.stage == PICK_BAD_INSTABLE) break;
 
         if (!move_is_legal(board, currmove)) continue;
 
@@ -940,7 +939,7 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
         // Futility Pruning. If we already have non-mating score and our move
         // doesn't give check, test if playing it has a chance to make the score
         // go over alpha.
-        if (bestScore > -MATE_FOUND && canFutilityPrune && !givesCheck
+        if (bestScore > -MATE_FOUND && canPrune && !givesCheck
             && move_type(currmove) == NORMAL_MOVE)
         {
             score_t delta = futilityBase + PieceScores[ENDGAME][piece_on(board, to_sq(currmove))];
