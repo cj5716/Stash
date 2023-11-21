@@ -598,6 +598,7 @@ __main_loop:
         moveCount++;
 
         bool isQuiet = !is_capture_or_promotion(board, currmove);
+        bool givesCheck = move_gives_check(board, currmove);
 
         if (!rootNode && bestScore > -MATE_FOUND)
         {
@@ -619,7 +620,7 @@ __main_loop:
             // to lose too much material to be interesting.
             if (depth <= 8
                 && !see_greater_than(
-                    board, currmove, (isQuiet ? -62 * depth : -24 * depth * depth)))
+                    board, currmove, (isQuiet && !givesCheck ? -62 * depth : -24 * depth * depth)))
                 continue;
         }
 
@@ -636,7 +637,6 @@ __main_loop:
         int R;
         int extension = 0;
         int newDepth = depth - 1;
-        bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
