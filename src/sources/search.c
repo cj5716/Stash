@@ -922,13 +922,14 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
     if (pvNode) (ss + 1)->pv = pv;
 
     // Check if Futility Pruning is possible in the moves loop.
-    const bool canFutilityPrune = (!inCheck && popcount(board->piecetypeBB[ALL_PIECES]) > 6);
+    const bool lowPieceCount = popcount(board->piecetypeBB[ALL_PIECES]) <= 6;
+    const bool canFutilityPrune = !inCheck && !lowPieceCount;
     const score_t futilityBase = bestScore + 120;
 
     while ((currmove = movepicker_next_move(&mp, false, 0)) != NO_MOVE)
     {
         // Only analyse good capture moves.
-        if (bestScore > -MATE_FOUND && mp.stage == PICK_BAD_INSTABLE) break;
+        if (bestScore > -MATE_FOUND && !lowPieceCount && mp.stage == PICK_BAD_INSTABLE) break;
 
         if (!move_is_legal(board, currmove)) continue;
 
