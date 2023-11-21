@@ -568,6 +568,10 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // Reduce depth if the node is absent from TT.
     if (!rootNode && !found && depth >= 4) --depth;
 
+    // Reduce depth if the node was expected to fail high, but a higher depth TT entry
+    // had actually failed low in the past.
+    if (cutNode && found && depth >= 7 && ttDepth >= depth && !ttMove) --depth;
+
 __main_loop:
     movepicker_init(&mp, false, board, worker, ttMove, ss);
 
