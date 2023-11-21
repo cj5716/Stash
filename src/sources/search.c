@@ -718,7 +718,9 @@ __main_loop:
             R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
             // Decrease the reduction if the move escapes a capture.
-            R -= isQuiet && !see_greater_than(board, reverse_move(currmove), 0);
+            R -= isQuiet
+                 && !see_greater_than(
+                     board, reverse_move(currmove), KNIGHT_MG_SCORE - BISHOP_MG_SCORE);
 
             // Increase/decrease the reduction based on the move's history.
             R -= iclamp(histScore / 6000, -3, 3);
