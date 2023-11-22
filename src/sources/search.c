@@ -638,6 +638,7 @@ __main_loop:
         int newDepth = depth - 1;
         bool givesCheck = move_gives_check(board, currmove);
         int histScore = isQuiet ? get_history_score(board, worker, ss, currmove) : 0;
+        piece_t movedPiece = piece_on(board, from_sq(currmove));
 
         if (!rootNode && ss->plies < 2 * worker->rootDepth
             && 2 * ss->doubleExtensions < worker->rootDepth)
@@ -684,9 +685,15 @@ __main_loop:
             // that give check.
             else if (givesCheck)
                 extension = 1;
-        }
 
-        piece_t movedPiece = piece_on(board, from_sq(currmove));
+            // Recapture extensions. Extend non-LMR searches by one ply for TT recaptures
+            // on PV nodes with a good capture history.
+            else if (pvNode && currmove == ttMove && to_sq(currmove) == to_sq((ss - 1)->currentMove)
+                     && worker->capHistory[movedPiece][to_sq(currmove)]
+                                          [piece_type(piece_on(board, to_sq(currmove)))]
+                            >= 4096)
+                extension = 1;
+        }
 
         // Save the piece history for the current move so that sub-nodes can use
         // it for ordering moves.
