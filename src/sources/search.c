@@ -580,7 +580,8 @@ __main_loop:
     int ccount = 0;
     bool skipQuiets = false;
 
-    while ((currmove = movepicker_next_move(&mp, skipQuiets, 0)) != NO_MOVE)
+    while ((currmove = movepicker_next_move(&mp, skipQuiets, KNIGHT_MG_SCORE - BISHOP_MG_SCORE))
+           != NO_MOVE)
     {
         if (rootNode)
         {
@@ -925,7 +926,8 @@ score_t qsearch(bool pvNode, Board *board, score_t alpha, score_t beta, Searchst
     const bool canFutilityPrune = (!inCheck && popcount(board->piecetypeBB[ALL_PIECES]) > 6);
     const score_t futilityBase = bestScore + 120;
 
-    while ((currmove = movepicker_next_move(&mp, false, 0)) != NO_MOVE)
+    while (
+        (currmove = movepicker_next_move(&mp, false, KNIGHT_MG_SCORE - BISHOP_MG_SCORE)) != NO_MOVE)
     {
         // Only analyse good capture moves.
         if (bestScore > -MATE_FOUND && mp.stage == PICK_BAD_INSTABLE) break;
