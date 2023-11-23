@@ -172,6 +172,7 @@ void init_base_values(tp_vector_t base)
     INIT_BASE_SP(IDX_STRAGGLER, StragglerPenalty);
     INIT_BASE_SP(IDX_DOUBLED, DoubledPenalty);
     INIT_BASE_SP(IDX_ISOLATED, IsolatedPenalty);
+    INIT_BASE_SP(IDX_PASSED_SQUARE, PP_PassedSquare);
 
     INIT_BASE_SP(IDX_PAWN_ATK_MINOR, PawnAttacksMinor);
     INIT_BASE_SP(IDX_PAWN_ATK_ROOK, PawnAttacksRook);
@@ -627,6 +628,8 @@ void print_parameters(const tp_vector_t base, const tp_vector_t delta)
     PRINT_SPA_PARTIAL(IDX_PP_OUR_KING_PROX, PP_OurKingProximity, 8, 1, 8, 4, "SPAIR");
     putchar('\n');
     PRINT_SPA_PARTIAL(IDX_PP_THEIR_KING_PROX, PP_TheirKingProximity, 8, 1, 8, 4, "SPAIR");
+    putchar('\n');
+    PRINT_SP_NICE(IDX_PP_PASSED_SQUARE, PP_PassedSquare);
     putchar('\n');
 
     printf("// King Safety eval terms\n");
