@@ -714,6 +714,9 @@ __main_loop:
             // Increase the reduction for cutNodes.
             R += cutNode;
 
+            // Increase the reduction for bad captures.
+            R += (mp.stage == PICK_BAD_INSTABLE);
+
             // Decrease the reduction if the move is a killer or countermove.
             R -= (currmove == mp.killer1 || currmove == mp.killer2 || currmove == mp.counter);
 
