@@ -629,7 +629,7 @@ void print_parameters(const tp_vector_t base, const tp_vector_t delta)
     putchar('\n');
     PRINT_SPA_PARTIAL(IDX_PP_THEIR_KING_PROX, PP_TheirKingProximity, 8, 1, 8, 4, "SPAIR");
     putchar('\n');
-    PRINT_SP(IDX_PP_PASSED_SQUARE, PP_PassedSquare);
+    PRINT_SP_NICE(IDX_PP_PASSED_SQUARE, PP_PassedSquare, 4, 15);
     putchar('\n');
 
     printf("// King Safety eval terms\n");
