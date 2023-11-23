@@ -623,7 +623,10 @@ scorepair_t evaluate_passed_pos(const Board *board, const PawnEntry *entry, colo
         if (!board->stack->material[not_color(us)]
             && SquareDistance[sq][promoSq]
                    < SquareDistance[theirKing][promoSq] - (us != board->sideToMove))
+        {
+            TRACE_ADD(IDX_PP_PASSED_SQUARE, us, 1);
             ret += PP_PassedSquare;
+        }
 
         TRACE_ADD(IDX_PP_OUR_KING_PROX + ourDistance - 1, us, 1);
         TRACE_ADD(IDX_PP_THEIR_KING_PROX + theirDistance - 1, us, 1);
