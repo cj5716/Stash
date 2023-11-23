@@ -38,7 +38,7 @@ const scorepair_t Initiative = SPAIR(15, 9);
 const scorepair_t PP_OurKingProximity[8] = {
     0,
     SPAIR( -25,  45),
-    SPAIR( -26,  29),
+    SPAIR( -25,  29),
     SPAIR( -11,  -2),
     SPAIR(  -7, -16),
     SPAIR(  -2, -17),
@@ -48,7 +48,7 @@ const scorepair_t PP_OurKingProximity[8] = {
 
 const scorepair_t PP_TheirKingProximity[8] = {
     0,
-    SPAIR( -82,-101),
+    SPAIR( -82,-102),
     SPAIR(  -2, -19),
     SPAIR(   1,   6),
     SPAIR(   8,  20),
@@ -57,42 +57,42 @@ const scorepair_t PP_TheirKingProximity[8] = {
     SPAIR(  -1,  25)
 };
 
-const scorepair_t PP_PassedSquare = SPAIR(  -0, 199);
+const scorepair_t PP_PassedSquare = SPAIR(  -0, 198);
 
 // King Safety eval terms
-const scorepair_t KnightWeight    = SPAIR(  39,  10);
-const scorepair_t BishopWeight    = SPAIR(  22,  19);
-const scorepair_t RookWeight      = SPAIR(  17, -37);
+const scorepair_t KnightWeight    = SPAIR(  39,  11);
+const scorepair_t BishopWeight    = SPAIR(  22,  20);
+const scorepair_t RookWeight      = SPAIR(  17, -36);
 const scorepair_t QueenWeight     = SPAIR(  24,   7);
-const scorepair_t AttackWeight    = SPAIR(  19, -15);
-const scorepair_t WeakKingZone    = SPAIR(  19, -11);
+const scorepair_t AttackWeight    = SPAIR(  19,  -6);
+const scorepair_t WeakKingZone    = SPAIR(  19,  -6);
 const scorepair_t SafeKnightCheck = SPAIR(  54,   5);
-const scorepair_t SafeBishopCheck = SPAIR(  45,  17);
-const scorepair_t SafeRookCheck   = SPAIR(  63,  22);
-const scorepair_t SafeQueenCheck  = SPAIR(  44,  25);
-const scorepair_t QueenlessAttack = SPAIR( -94,  -0);
-const scorepair_t SafetyOffset    = SPAIR(  34,  29);
+const scorepair_t SafeBishopCheck = SPAIR(  45,  18);
+const scorepair_t SafeRookCheck   = SPAIR(  63,  24);
+const scorepair_t SafeQueenCheck  = SPAIR(  44,  27);
+const scorepair_t QueenlessAttack = SPAIR( -95,   1);
+const scorepair_t SafetyOffset    = SPAIR(  34,  31);
 
 // Storm/Shelter indexes:
 // 0-7 - Side
 // 9-15 - Front
 // 16-23 - Center
 const scorepair_t KingStorm[24] = {
-    SPAIR(  -6,  -0), SPAIR(  -6,  -0), SPAIR(  21,   2), SPAIR(   1,   2),
-    SPAIR( -20,   7), SPAIR( -23,   4), SPAIR( -45,   4), SPAIR( -16,   3),
-    SPAIR(   0,   0), SPAIR(  -3,  -1), SPAIR(  32,   8), SPAIR(   6,   0),
-    SPAIR(  -2,   2), SPAIR(  -3,   9), SPAIR(   7,  12), SPAIR(  15,   1),
+    SPAIR(  -6,  -0), SPAIR(  -7,  -0), SPAIR(  21,   3), SPAIR(   1,   3),
+    SPAIR( -20,   8), SPAIR( -23,   4), SPAIR( -45,   4), SPAIR( -16,   4),
+    SPAIR(   0,   0), SPAIR(  -2,  -1), SPAIR(  31,   8), SPAIR(   6,   1),
+    SPAIR(  -2,   2), SPAIR(  -3,   9), SPAIR(   7,  13), SPAIR(  16,   2),
     SPAIR(   5,  -0), SPAIR(  -1,  -0), SPAIR(  33,   3), SPAIR(  27,  -1),
-    SPAIR(  -0,   3), SPAIR(  -8,   9), SPAIR(  -6,  21), SPAIR(   4,  -3)
+    SPAIR(  -0,   3), SPAIR(  -8,  10), SPAIR(  -6,  22), SPAIR(   5,  -2)
 };
 
 const scorepair_t KingShelter[24] = {
-    SPAIR( -31,   5), SPAIR( -29,  26), SPAIR( -29,  -2), SPAIR( -21,   3),
-    SPAIR(   9,  -0), SPAIR(   6,  -0), SPAIR(   4,  -0), SPAIR(  -3, -12),
-    SPAIR(   0,   0), SPAIR(  -4,   7), SPAIR(  -5,  20), SPAIR(   9,   9),
-    SPAIR(  12,   2), SPAIR(  18,  -0), SPAIR(   4,   0), SPAIR(  22,  -9),
-    SPAIR( -31,  -4), SPAIR(   3, -16), SPAIR(  10,  13), SPAIR(  13,  22),
-    SPAIR(  19,   5), SPAIR(  21,   0), SPAIR(   4,  -0), SPAIR(  19,   9)
+    SPAIR( -31,   5), SPAIR( -29,  28), SPAIR( -30,  -2), SPAIR( -21,   4),
+    SPAIR(   9,  -0), SPAIR(   5,  -0), SPAIR(   4,  -0), SPAIR(  -3, -12),
+    SPAIR(   0,   0), SPAIR(  -4,   7), SPAIR(  -5,  21), SPAIR(   9,   9),
+    SPAIR(  12,   3), SPAIR(  18,  -0), SPAIR(   4,   0), SPAIR(  22,  -9),
+    SPAIR( -31,  -4), SPAIR(   3, -18), SPAIR(  10,  14), SPAIR(  12,  23),
+    SPAIR(  19,   6), SPAIR(  21,   0), SPAIR(   5,  -0), SPAIR(  19,  10)
 };
 
 // Knight eval terms
@@ -102,17 +102,17 @@ const scorepair_t KnightCenterOutpost = SPAIR( 16,  8);
 const scorepair_t KnightSolidOutpost  = SPAIR( 15, 21);
 
 const scorepair_t ClosedPosKnight[5] = {
-    SPAIR(  -3, -27), SPAIR(   4,  -8), SPAIR(   4,   7), SPAIR(   7,  16),
-    SPAIR(   6,  33)
+    SPAIR(  -3, -26), SPAIR(   4,  -7), SPAIR(   4,   7), SPAIR(   6,  17),
+    SPAIR(   6,  34)
 };
 
 // Bishop eval terms
-const scorepair_t BishopPairBonus    = SPAIR( 25, 95);
+const scorepair_t BishopPairBonus    = SPAIR( 24, 96);
 const scorepair_t BishopShielded     = SPAIR(  7, 11);
-const scorepair_t BishopLongDiagonal = SPAIR( 12, 28);
+const scorepair_t BishopLongDiagonal = SPAIR( 12, 29);
 
 const scorepair_t BishopPawnsSameColor[7] = {
-    SPAIR(  14,  26), SPAIR(  14,  18), SPAIR(  10,   8), SPAIR(   5,   1),
+    SPAIR(  14,  27), SPAIR(  14,  18), SPAIR(  10,   8), SPAIR(   5,   1),
     SPAIR(  -1,  -8), SPAIR(  -7, -15), SPAIR( -13, -20)
 };
 
@@ -124,38 +124,38 @@ const scorepair_t RookXrayQueen      = SPAIR( 11,  4);
 
 // Mobility eval terms
 const scorepair_t MobilityN[9] = {
-    SPAIR( -58,  21), SPAIR( -42, -34), SPAIR( -35,  26), SPAIR( -29,  54),
-    SPAIR( -22,  69), SPAIR( -17,  87), SPAIR( -12,  95), SPAIR(  -7, 101),
-    SPAIR(  -5,  95)
+    SPAIR( -58,  21), SPAIR( -43, -34), SPAIR( -36,  27), SPAIR( -29,  55),
+    SPAIR( -22,  70), SPAIR( -17,  87), SPAIR( -12,  96), SPAIR(  -7, 102),
+    SPAIR(  -6,  96)
 };
 
 const scorepair_t MobilityB[14] = {
-    SPAIR( -45, -31), SPAIR( -44, -47), SPAIR( -29, -15), SPAIR( -25,  15),
-    SPAIR( -17,  34), SPAIR( -13,  47), SPAIR(  -9,  55), SPAIR(  -9,  57),
-    SPAIR(  -9,  57), SPAIR(  -8,  55), SPAIR(  -5,  49), SPAIR(  -2,  46),
-    SPAIR(   3,  39), SPAIR(   9,  29)
+    SPAIR( -45, -31), SPAIR( -44, -47), SPAIR( -29, -15), SPAIR( -25,  16),
+    SPAIR( -17,  34), SPAIR( -13,  48), SPAIR(  -9,  55), SPAIR(  -9,  58),
+    SPAIR(  -9,  58), SPAIR(  -8,  56), SPAIR(  -5,  49), SPAIR(  -1,  46),
+    SPAIR(   3,  39), SPAIR(   9,  30)
 };
 
 const scorepair_t MobilityR[15] = {
-    SPAIR(-104,   8), SPAIR( -46,  26), SPAIR( -35,  69), SPAIR( -39,  87),
-    SPAIR( -34,  99), SPAIR( -31, 111), SPAIR( -28, 123), SPAIR( -22, 127),
-    SPAIR( -17, 134), SPAIR( -11, 139), SPAIR(  -8, 143), SPAIR(  -5, 145),
-    SPAIR(   2, 144), SPAIR(   5, 140), SPAIR(  11, 134)
+    SPAIR(-103,   8), SPAIR( -46,  26), SPAIR( -36,  69), SPAIR( -39,  87),
+    SPAIR( -34,  99), SPAIR( -31, 112), SPAIR( -28, 124), SPAIR( -22, 127),
+    SPAIR( -17, 135), SPAIR( -11, 139), SPAIR(  -8, 143), SPAIR(  -5, 146),
+    SPAIR(   1, 145), SPAIR(   5, 140), SPAIR(  12, 135)
 };
 
 const scorepair_t MobilityQ[28] = {
-    SPAIR( -77,-166), SPAIR(  18, 156), SPAIR(  -3, 166), SPAIR(  -8, 144),
-    SPAIR(  -2,  94), SPAIR(  -5, 118), SPAIR(  -4, 144), SPAIR(  -3, 167),
-    SPAIR(  -0, 182), SPAIR(   3, 195), SPAIR(   6, 204), SPAIR(  10, 208),
-    SPAIR(  12, 212), SPAIR(  14, 213), SPAIR(  15, 216), SPAIR(  15, 221),
-    SPAIR(  16, 221), SPAIR(  17, 218), SPAIR(  22, 210), SPAIR(  29, 200),
-    SPAIR(  34, 195), SPAIR(  31, 187), SPAIR(  25, 182), SPAIR(  20, 172),
+    SPAIR( -76,-165), SPAIR(  18, 157), SPAIR(  -3, 165), SPAIR(  -8, 143),
+    SPAIR(  -2,  93), SPAIR(  -5, 118), SPAIR(  -4, 145), SPAIR(  -3, 167),
+    SPAIR(  -0, 182), SPAIR(   3, 196), SPAIR(   7, 204), SPAIR(  10, 208),
+    SPAIR(  12, 212), SPAIR(  14, 214), SPAIR(  15, 217), SPAIR(  15, 222),
+    SPAIR(  16, 222), SPAIR(  17, 219), SPAIR(  22, 210), SPAIR(  30, 201),
+    SPAIR(  34, 196), SPAIR(  32, 187), SPAIR(  25, 182), SPAIR(  20, 172),
     SPAIR(  42, 153), SPAIR(  -7, 168), SPAIR(  14, 180), SPAIR(  47, 158)
 };
 
 // Threat eval terms
-const scorepair_t PawnAttacksMinor  = SPAIR( 44, 73);
-const scorepair_t PawnAttacksRook   = SPAIR( 55, 52);
+const scorepair_t PawnAttacksMinor  = SPAIR( 44, 74);
+const scorepair_t PawnAttacksRook   = SPAIR( 56, 53);
 const scorepair_t PawnAttacksQueen  = SPAIR( 49, 10);
 const scorepair_t MinorAttacksRook  = SPAIR( 57, 42);
 const scorepair_t MinorAttacksQueen = SPAIR( 42, 47);
