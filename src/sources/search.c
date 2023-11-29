@@ -590,10 +590,8 @@ __main_loop:
                 == NULL)
                 continue;
         }
-        else
-        {
-            if (!move_is_legal(board, currmove) || currmove == ss->excludedMove) continue;
-        }
+        else if (!move_is_legal(board, currmove) || currmove == ss->excludedMove)
+            continue;
 
         moveCount++;
 
@@ -601,13 +599,15 @@ __main_loop:
 
         if (!rootNode && bestScore > -MATE_FOUND)
         {
+            int lmrDepth = depth - lmr_base_value(depth, moveCount, improving, isQuiet);
+
             // Late Move Pruning. For low-depth nodes, stop searching quiets
             // after a certain movecount has been reached.
             if (depth <= 6 && moveCount > Pruning[improving][depth]) skipQuiets = true;
 
             // Futility Pruning. For low-depth nodes, stop searching quiets if
             // the eval suggests that only captures will save the day.
-            if (depth <= 6 && !inCheck && isQuiet && eval + 217 + 71 * depth <= alpha)
+            if (lmrDepth <= 5 && !inCheck && isQuiet && eval + 217 + 71 * depth <= alpha)
                 skipQuiets = true;
 
             // Continuation History Pruning. For low-depth nodes, prune quiet moves if
