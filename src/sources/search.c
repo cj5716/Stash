@@ -44,7 +44,7 @@ void init_search_tables(void)
     for (int d = 1; d < 16; ++d)
     {
         Pruning[1][d] = +3.19 + 3.66 * pow(d, 1.07);
-        Pruning[0][d] = -1.33 + 3.09 * pow(d, 0.65);
+        Pruning[0][d] = -0.33 + 3.09 * pow(d, 0.65);
     }
 }
 
