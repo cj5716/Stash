@@ -26,8 +26,8 @@
 
 #define LAMBDA 0.2
 #define THREADS 3
-#define ITERS 10000
-#define LEARNING_RATE 0.001
+#define ITERS 1000
+#define LEARNING_RATE 0.01
 #define LR_DROP_ITERS 10000
 #define LR_DROP_VALUE 1.0
 #define BATCH_SIZE 2048
