@@ -31,12 +31,12 @@ const scorepair_t IsolatedPenalty  = SPAIR( -9, -8);
 // Rank-based bonus for passed Pawns
 const scorepair_t PassedBonus[8] = {
     0,
-    SPAIR(-17,-42),
+    SPAIR(-17,-43),
     SPAIR(-19,-24),
     SPAIR(-13, 36),
-    SPAIR( 19, 95),
-    SPAIR( 41,188),
-    SPAIR( 72,326),
+    SPAIR( 18, 95),
+    SPAIR( 40,189),
+    SPAIR( 73,327),
     0
 };
 
@@ -45,10 +45,10 @@ const scorepair_t PhalanxBonus[8] = {
     0,
     SPAIR(  4,  4),
     SPAIR( 13,  6),
-    SPAIR( 24, 29),
-    SPAIR( 47, 57),
-    SPAIR(163,226),
-    SPAIR(183,230),
+    SPAIR( 24, 30),
+    SPAIR( 47, 58),
+    SPAIR(164,226),
+    SPAIR(184,232),
     0
 };
 
@@ -56,10 +56,10 @@ const scorepair_t PhalanxBonus[8] = {
 const scorepair_t DefenderBonus[8] = {
     0,
     SPAIR( 15, 20),
-    SPAIR( 11, 19),
-    SPAIR( 21, 29),
-    SPAIR( 55, 80),
-    SPAIR(163,126),
+    SPAIR( 11, 20),
+    SPAIR( 21, 30),
+    SPAIR( 55, 81),
+    SPAIR(164,128),
     0,
     0
 };
