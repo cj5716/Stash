@@ -526,8 +526,8 @@ score_t search(bool pvNode, Board *board, int depth, score_t alpha, score_t beta
     // previous move.
     const score_t probCutBeta = beta + 140;
 
-    if (!rootNode && depth >= 6 && abs(beta) < VICTORY
-        && !(found && ttDepth >= depth - 4 && ttScore < probCutBeta))
+    if (!rootNode && depth >= 5 && abs(beta) < VICTORY
+        && !(found && ttDepth >= depth - 3 && ttScore < probCutBeta))
     {
         const score_t probCutSEE = probCutBeta - ss->staticEval;
         move_t currmove;
